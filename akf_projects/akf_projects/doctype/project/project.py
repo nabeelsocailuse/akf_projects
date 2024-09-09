@@ -353,22 +353,22 @@ class Project(Document):
 
 	# Mubashir Bashir
 	def validate_payable(self):
-        if(self.status == 'Financial Close'):
-            payable_balance = self.get_project_payable_balance()['balance']
-            if(payable_balance > 0):
-                frappe.throw(_(f'Cannot complete the project because the payable account balance {payable_balance} is pending.'))
+		if(self.status == 'Financial Close'):
+			payable_balance = self.get_project_payable_balance()['balance']
+			if(payable_balance > 0):
+				frappe.throw(_(f'Cannot complete the project because the payable account balance {payable_balance} is pending.'))
 
-    def get_project_payable_balance(self):
-        payable_balance = 0
-        gl_entries = frappe.get_all('GL Entry', 
-                    filters={'project': self.name, 'docstatus': 1}, 
-                    fields=['account', 'debit', 'credit'])
-        for entry in gl_entries:
-            account_type = frappe.db.get_value('Account', entry['account'], 'account_type')
+	def get_project_payable_balance(self):
+		payable_balance = 0
+		gl_entries = frappe.get_all('GL Entry', 
+					filters={'project': self.name, 'docstatus': 1}, 
+					fields=['account', 'debit', 'credit'])
+		for entry in gl_entries:
+			account_type = frappe.db.get_value('Account', entry['account'], 'account_type')
 
-            if(account_type == 'Payable'):
-                payable_balance += entry['credit'] - entry['debit']
-        return {'balance': payable_balance}
+			if(account_type == 'Payable'):
+				payable_balance += entry['credit'] - entry['debit']
+		return {'balance': payable_balance}
 
 def get_timeline_data(doctype: str, name: str) -> dict[int, int]:
 	"""Return timeline for attendance"""

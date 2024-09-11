@@ -133,7 +133,12 @@ override_doctype_class = {
 # Scheduled Tasks
 # ---------------
 
-# scheduler_events = {
+scheduler_events = {
+	"cron" :{
+		"0 0 * * *": [
+            "akf_projects.akf_projects.doctype.survey_forms.survey_forms.fetch_api_data",
+        ],
+	}
 # 	"all": [
 # 		"akf_projects.tasks.all"
 # 	],
@@ -149,7 +154,7 @@ override_doctype_class = {
 # 	"monthly": [
 # 		"akf_projects.tasks.monthly"
 # 	],
-# }
+}
 
 # Testing
 # -------

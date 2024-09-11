@@ -1,0 +1,132 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "autoname": "field:record_id",
+ "creation": "2024-09-03 12:39:35.575125",
+ "default_view": "List",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "form_label",
+  "forms_data",
+  "html_content",
+  "record_id",
+  "form_id",
+  "other_info_section",
+  "start_time",
+  "id",
+  "status",
+  "submitted_by",
+  "column_break_jkwrz",
+  "end_time",
+  "version",
+  "validation_status",
+  "submission_time"
+ ],
+ "fields": [
+  {
+   "fieldname": "form_id",
+   "fieldtype": "Data",
+   "label": "Form ID"
+  },
+  {
+   "fieldname": "forms_data",
+   "fieldtype": "HTML",
+   "label": "Forms Data"
+  },
+  {
+   "fieldname": "form_label",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Form Name"
+  },
+  {
+   "fieldname": "html_content",
+   "fieldtype": "Long Text",
+   "hidden": 1,
+   "label": "HTML Content"
+  },
+  {
+   "fieldname": "record_id",
+   "fieldtype": "Data",
+   "label": "Record ID",
+   "unique": 1
+  },
+  {
+   "collapsible": 1,
+   "fieldname": "other_info_section",
+   "fieldtype": "Section Break",
+   "label": "Other Info"
+  },
+  {
+   "fieldname": "start_time",
+   "fieldtype": "Datetime",
+   "label": "Start Time"
+  },
+  {
+   "fieldname": "id",
+   "fieldtype": "Data",
+   "label": "ID"
+  },
+  {
+   "fieldname": "status",
+   "fieldtype": "Data",
+   "label": "Status"
+  },
+  {
+   "fieldname": "submitted_by",
+   "fieldtype": "Data",
+   "label": "Submitted By"
+  },
+  {
+   "fieldname": "column_break_jkwrz",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "end_time",
+   "fieldtype": "Datetime",
+   "label": "End Time"
+  },
+  {
+   "fieldname": "version",
+   "fieldtype": "Data",
+   "label": "Version"
+  },
+  {
+   "fieldname": "validation_status",
+   "fieldtype": "Data",
+   "label": "Validation Status"
+  },
+  {
+   "fieldname": "submission_time",
+   "fieldtype": "Datetime",
+   "label": "Submission Time"
+  }
+ ],
+ "index_web_pages_for_search": 1,
+ "links": [],
+ "modified": "2024-09-09 19:01:06.175593",
+ "modified_by": "Administrator",
+ "module": "AKF Projects",
+ "name": "Survey Forms",
+ "naming_rule": "By fieldname",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": []
+}

@@ -10,6 +10,7 @@
  "field_order": [
   "naming_series",
   "project_name",
+  "survey_id",
   "status",
   "project_type",
   "is_active",
@@ -453,6 +454,12 @@
    "fieldtype": "Table MultiSelect",
    "label": "Donors",
    "options": "Donor Multiselect"
+  },
+  {
+   "fieldname": "survey_id",
+   "fieldtype": "Link",
+   "label": "Survey ID",
+   "options": "Survey Forms"
   }
  ],
  "icon": "fa fa-puzzle-piece",
@@ -460,7 +467,7 @@
  "index_web_pages_for_search": 1,
  "links": [],
  "max_attachments": 4,
- "modified": "2024-09-05 16:25:13.278687",
+ "modified": "2024-09-26 18:06:18.024995",
  "modified_by": "Administrator",
  "module": "AKF Projects",
  "name": "Project",

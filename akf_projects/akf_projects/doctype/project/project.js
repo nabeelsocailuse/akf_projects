@@ -212,47 +212,25 @@ function loadFundsDashboard(frm){
 }
 
 function loadOpenStreetMap(){
-	// console.log(navigator.geolocation);
-	// if (navigator.geolocation) {
-		// navigator.geolocation.getCurrentPosition(openStreetMapFunc);
-		openStreetMapFunc(1);
-	// }
+	openStreetMapFunc(1);
 }
 
 function openStreetMapFunc(position) {
-	if (cur_frm.doc.custom_latitude != "" && cur_frm.doc.custom_latitude != "" && cur_frm.doc.custom_latitude != undefined && cur_frm.doc.custom_latitude != undefined) {
-		// 	// set current coordinates
-		// 	cur_frm.set_value("latitude", position.coords.latitude);
-		// 	cur_frm.set_value("longitude", position.coords.longitude);
-		// }
-
-		// latitude =  cur_frm.doc.latitude
-		// longitude =  cur_frm.doc.longitude
-		const latitude = cur_frm.doc.custom_latitude
-		const longitude = cur_frm.doc.custom_longitude
-		
+	const latitude = cur_frm.doc.custom_latitude;
+	const longitude = cur_frm.doc.custom_longitude;
+	if ((latitude!="" && latitude!=undefined) && longitude!="" && longitude!=undefined) {
 		var curLocation = [latitude, longitude];
-		
 		$("#map_id").empty();
 		$("#var_map").html(`<div id="map_id" style="height:400px"></div>`);
-		
 		setTimeout(() => {
-			// if(map != undefined || map != null){
-			// 	map.remove();
-			//    $("#map").html("");
-			// }
 			map = window.L.map('map_id').setView(curLocation, 16);
-			
 			const tiles = window.L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
 				maxZoom: 19,
 				attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
 			}).addTo(map);
-
 			const marker = window.L.marker(curLocation).addTo(map);
-			// .bindPopup('<b>Hello world!</b><br />I am a popup.').openPopup();
-			
 			map.panTo(new window.L.LatLng(latitude, longitude));
-
 		}, 500);
 	}
 }
+

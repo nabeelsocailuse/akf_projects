@@ -29,6 +29,11 @@ app_license = "mit"
 
 # include js in doctype views
 # doctype_js = {"doctype" : "public/js/doctype.js"}
+doctype_js = {
+    "Project" : "public/js/project_override.js",
+    }
+
+
 # doctype_list_js = {"doctype" : "public/js/doctype_list.js"}
 # doctype_tree_js = {"doctype" : "public/js/doctype_tree.js"}
 # doctype_calendar_js = {"doctype" : "public/js/doctype_calendar.js"}
@@ -116,7 +121,9 @@ app_license = "mit"
 
 override_doctype_class = {
 	# "Project": "akf_projects.customizations.extends.project.XProject"
+	"Project": "akf_projects.customizations.overrides.project.project_override.XProject"
 }
+
 
 # Document Events
 # ---------------
@@ -171,9 +178,9 @@ scheduler_events = {
 # each overriding function accepts a `data` argument;
 # generated from the base implementation of the doctype dashboard,
 # along with any modifications made in other Frappe apps
-# override_doctype_dashboards = {
-# 	"Task": "akf_projects.task.get_dashboard_data"
-# }
+override_doctype_dashboards = {
+	"Project": "akf_projects.customizations.overrides.project.project_dashboard.get_dashboard_data"
+}
 
 # exempt linked doctypes from being automatically cancelled
 #

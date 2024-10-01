@@ -17,7 +17,12 @@ frappe.ui.form.on("Project", {
 			},
 		};
 	},
+	onload_post_render: function(frm){
+		// loadFundsDashboard(frm);
+	},
 	onload: function (frm) {
+        console.log("project override onload");
+        
 		const so = frm.get_docfield("sales_order");
 		so.get_route_options_for_new_doc = () => {
 			if (frm.is_new()) return {};
@@ -60,6 +65,9 @@ frappe.ui.form.on("Project", {
 	},
 
 	refresh: function (frm) {
+
+        console.log("project override refresh");
+		
 		if (frm.doc.__islocal) {
 			frm.web_link && frm.web_link.remove();
 		} else {
@@ -193,19 +201,20 @@ function open_form(frm, doctype, child_doctype, parentfield) {
 function loadFundsDashboard(frm){
     if(!frm.is_new()){
         frappe.call({
-            "method": "akf_projects.akf_projects.doctype.project.financial_stats.get_funds_detail",
+            "method": "akf_projects.customizations.overrides.project.financial_stats.get_funds_detail",
+            // "method": "akf_projects.akf_projects.doctype.project.financial_stats.get_funds_detail",
             "args": {
                 "project": frm.doc.name,
                 "total_fund_allocated": frm.doc.total_fund_allocated						
             },
             callback: function(r){
                 const data = r.message;
+				frm.dashboard.refresh();
                 frm.dashboard.add_indicator(__('Allocated Funds: {0}',
                 [format_currency(data.allocated_fund)]), 'green');
                 frm.dashboard.add_indicator(__('Consumed Funds: {0}',
                     [format_currency(data.consumed_fund)]),
                 'red');
-
                 }
         });
     }

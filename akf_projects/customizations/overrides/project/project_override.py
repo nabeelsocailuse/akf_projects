@@ -19,16 +19,18 @@ from erpnext.setup.doctype.holiday_list.holiday_list import is_holiday
 
 from erpnext.accounts.party import get_dashboard_info
 
-class Project(Document):
+from erpnext.projects.doctype.project.project import Project
+
+class XProject(Project):
 	# begin: auto-generated types
 	# This code is auto-generated. Do not modify anything in this block.
 
 	from typing import TYPE_CHECKING
 
 	if TYPE_CHECKING:
-		from frappe.types import DF
-
+		from akf_projects.akf_projects.doctype.donor_multiselect.donor_multiselect import DonorMultiselect
 		from erpnext.projects.doctype.project_user.project_user import ProjectUser
+		from frappe.types import DF
 
 		actual_end_date: DF.Date | None
 		actual_start_date: DF.Date | None
@@ -39,10 +41,9 @@ class Project(Document):
 		cost_center: DF.Link | None
 		customer: DF.Link | None
 		daily_time_to_send: DF.Time | None
-		day_to_send: DF.Literal[
-			"Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"
-		]
+		day_to_send: DF.Literal["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"]
 		department: DF.Link | None
+		donors: DF.TableMultiSelect[DonorMultiselect]
 		estimated_costing: DF.Currency
 		expected_end_date: DF.Date | None
 		expected_start_date: DF.Date | None
@@ -64,7 +65,8 @@ class Project(Document):
 		project_type: DF.Link | None
 		sales_order: DF.Link | None
 		second_email: DF.Time | None
-		status: DF.Literal["Open", "Completed", "Cancelled"]
+		status: DF.Literal["Open", "Completed", "Cancelled", "Financial Close"]
+		survey_id: DF.Link | None
 		to_time: DF.Time | None
 		total_billable_amount: DF.Currency
 		total_billed_amount: DF.Currency
@@ -89,11 +91,18 @@ class Project(Document):
 			),
 		)
 		self.update_costing()
+		self.load_dashboard_info()
+	
+	def load_dashboard_info(self):
+		# info = get_dashboard_info(self.doctype, self.name, self.loyalty_program)
+		self.set_onload("dashboard_info", [ { "billing_this_year": 118036027.77, "company": "Alkhidmat Foundation Pakistan", "currency": "PKR", "total_unpaid": 1064742.57 } ])
 
 	def before_print(self, settings=None):
 		self.onload()
 
 	def validate(self):
+		super(XProject, self).validate()
+		# frappe.msgprint("Project Override is working...")
 		if not self.is_new():
 			self.copy_from_template()
 		self.send_welcome_email()
@@ -103,15 +112,14 @@ class Project(Document):
 		self.validate_from_to_dates("actual_start_date", "actual_end_date")
 		self.validate_payable() # Mubashir Bashir
 
-	def copy_from_template(self):
+
+	def copy_from_template(self):	#Mubashir Bashir
 		"""
 		Copy tasks from template
 		"""
 		if self.project_template and not frappe.db.get_all("Task", dict(project=self.name), limit=1):
 
-			# has a template, and no loaded tasks, so lets create
 			if not self.expected_start_date:
-				# project starts today
 				self.expected_start_date = today()
 
 			template = frappe.get_doc("Project Template", self.project_template)
@@ -122,23 +130,36 @@ class Project(Document):
 			# create tasks from template
 			project_tasks = []
 			tmp_task_details = []
+			previous_task_end_date = None 
+
 			for task in template.tasks:
 				template_task_details = frappe.get_doc("Task", task.task)
 				tmp_task_details.append(template_task_details)
-				task = self.create_task_from_template(template_task_details)
+	
+				task = self.create_task_from_template(template_task_details, previous_task_end_date)
 				project_tasks.append(task)
+
+				previous_task_end_date = task.exp_end_date
 
 			self.dependency_mapping(tmp_task_details, project_tasks)
 
-	def create_task_from_template(self, task_details):
+			self.expected_end_date = previous_task_end_date
+
+	def create_task_from_template(self, task_details, previous_task_end_date=None):	#Mubashir Bashir
+
+		exp_start_date = self.calculate_start_date(task_details, previous_task_end_date)
+		exp_end_date = self.calculate_end_date(task_details, exp_start_date)
+		# frappe.msgprint(f'Start Date {exp_start_date} - End Date {exp_end_date}')
+
+		# Initialize the task dictionary
 		return frappe.get_doc(
 			dict(
 				doctype="Task",
 				subject=task_details.subject,
 				project=self.name,
 				status="Open",
-				exp_start_date=self.calculate_start_date(task_details),
-				exp_end_date=self.calculate_end_date(task_details),
+				exp_start_date=exp_start_date,
+				exp_end_date=exp_end_date,
 				description=task_details.description,
 				task_weight=task_details.task_weight,
 				type=task_details.type,
@@ -146,23 +167,48 @@ class Project(Document):
 				is_group=task_details.is_group,
 				color=task_details.color,
 				template_task=task_details.name,
+				priority=task_details.priority,
 			)
 		).insert()
 
-	def calculate_start_date(self, task_details):
-		self.start_date = add_days(self.expected_start_date, task_details.start)
-		self.start_date = self.update_if_holiday(self.start_date)
-		return self.start_date
+	def calculate_start_date(self, task_details, previous_task_end_date):	#Mubashir Bashir
+		"""
+		Calculate the start date of the task.
+		For the first task, use the project's expected start date.
+		For subsequent tasks, use the next working day after the previous task's end date.
+		Adjust the start date if it falls on a holiday.
+		"""
 
-	def calculate_end_date(self, task_details):
-		self.end_date = add_days(self.start_date, task_details.duration)
-		return self.update_if_holiday(self.end_date)
+		if previous_task_end_date:
+			start_date = add_days(previous_task_end_date, 1)
+		else:
+			start_date = self.expected_start_date
 
-	def update_if_holiday(self, date):
 		holiday_list = self.holiday_list or get_holiday_list(self.company)
-		while is_holiday(holiday_list, date):
-			date = add_days(date, 1)
-		return date
+		
+		while is_holiday(holiday_list, start_date):
+			start_date = add_days(start_date, 1)
+
+		return start_date
+
+	def calculate_end_date(self, task_details, start_date):	#Mubashir Bashir
+		"""
+		Calculate the end date based on the start date and duration of the task.
+		Skips holidays in the calculation.
+		"""
+		end_date = start_date
+		days_to_add = task_details.duration-1
+
+		while days_to_add > 0:			
+			end_date = add_days(end_date, 1)
+
+			if not is_holiday(self.holiday_list or get_holiday_list(self.company), end_date):
+				days_to_add -= 1
+
+		return end_date
+
+
+
 
 	def dependency_mapping(self, template_tasks, project_tasks):
 		for project_task in project_tasks:
@@ -358,6 +404,7 @@ class Project(Document):
 			if(payable_balance > 0):
 				frappe.throw(_(f'Cannot complete the project because the payable account balance {payable_balance} is pending.'))
 
+			
 	def get_project_payable_balance(self):
 		payable_balance = 0
 		gl_entries = frappe.get_all('GL Entry', 

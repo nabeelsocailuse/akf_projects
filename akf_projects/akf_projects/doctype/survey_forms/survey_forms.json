@@ -18,11 +18,14 @@
   "id",
   "status",
   "submitted_by",
+  "region",
+  "project",
   "column_break_jkwrz",
   "end_time",
   "version",
   "validation_status",
-  "submission_time"
+  "submission_time",
+  "district"
  ],
  "fields": [
   {
@@ -102,12 +105,30 @@
    "fieldname": "submission_time",
    "fieldtype": "Datetime",
    "label": "Submission Time"
+  },
+  {
+   "fieldname": "region",
+   "fieldtype": "Link",
+   "label": "Region",
+   "options": "Region"
+  },
+  {
+   "fieldname": "district",
+   "fieldtype": "Link",
+   "label": "District",
+   "options": "District"
+  },
+  {
+   "fieldname": "project",
+   "fieldtype": "Link",
+   "label": "Project",
+   "options": "Project"
   }
  ],
  "in_create": 1,
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2024-09-18 16:23:38.182905",
+ "modified": "2024-09-30 18:10:50.940726",
  "modified_by": "Administrator",
  "module": "AKF Projects",
  "name": "Survey Forms",
@@ -127,6 +148,7 @@
    "write": 1
   }
  ],
+ "search_fields": "form_label",
  "sort_field": "modified",
  "sort_order": "DESC",
  "states": []

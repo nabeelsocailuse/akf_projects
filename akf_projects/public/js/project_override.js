@@ -17,12 +17,12 @@ frappe.ui.form.on("Project", {
 			},
 		};
 	},
-	onload_post_render: function(frm){
+	onload_post_render: function (frm) {
 		// loadFundsDashboard(frm);
 	},
 	onload: function (frm) {
-        console.log("project override onload");
-        
+		console.log("project override onload");
+
 		const so = frm.get_docfield("sales_order");
 		so.get_route_options_for_new_doc = () => {
 			if (frm.is_new()) return {};
@@ -66,8 +66,8 @@ frappe.ui.form.on("Project", {
 
 	refresh: function (frm) {
 
-        console.log("project override refresh");
-		
+		console.log("project override refresh");
+
 		if (frm.doc.__islocal) {
 			frm.web_link && frm.web_link.remove();
 		} else {
@@ -77,11 +77,12 @@ frappe.ui.form.on("Project", {
 		}
 		frm.trigger("set_custom_buttons");
 
-        loadFundsDashboard(frm);
-        loadOpenStreetMap();
+		loadFundsDashboard(frm);
+		loadOpenStreetMap();
+		loadDonorsDashboard(frm)
 	},
 
-	set_custom_buttons: function(frm) {
+	set_custom_buttons: function (frm) {
 		if (!frm.is_new()) {
 			frm.add_custom_button(__('Duplicate Project with Tasks'), () => {
 				frm.events.create_duplicate(frm);
@@ -115,13 +116,13 @@ frappe.ui.form.on("Project", {
 
 	},
 
-	update_total_purchase_cost: function(frm) {
+	update_total_purchase_cost: function (frm) {
 		frappe.call({
 			method: "erpnext.projects.doctype.project.project.recalculate_project_total_purchase_cost",
-			args: {project: frm.doc.name},
+			args: { project: frm.doc.name },
 			freeze: true,
 			freeze_message: __('Recalculating Purchase Cost against this Project...'),
-			callback: function(r) {
+			callback: function (r) {
 				if (r && !r.exc) {
 					frappe.msgprint(__('Total Purchase Cost has been updated'));
 					frm.refresh();
@@ -131,7 +132,7 @@ frappe.ui.form.on("Project", {
 		});
 	},
 
-	set_project_status_button: function(frm) {
+	set_project_status_button: function (frm) {
 		frm.add_custom_button(__('Set Project Status'), () => {
 			let d = new frappe.ui.Dialog({
 				"title": __("Set Project Status"),
@@ -144,7 +145,7 @@ frappe.ui.form.on("Project", {
 						"options": "Completed\nCancelled",
 					},
 				],
-				primary_action: function() {
+				primary_action: function () {
 					frm.events.set_status(frm, d.get_values().status);
 					d.hide();
 				},
@@ -153,7 +154,7 @@ frappe.ui.form.on("Project", {
 		}, __("Actions"));
 	},
 
-	create_duplicate: function(frm) {
+	create_duplicate: function (frm) {
 		return new Promise(resolve => {
 			frappe.prompt('Project Name', (data) => {
 				frappe.xcall('erpnext.projects.doctype.project.project.create_duplicate_project',
@@ -161,23 +162,23 @@ frappe.ui.form.on("Project", {
 						prev_doc: frm.doc,
 						project_name: data.value
 					}).then(() => {
-					frappe.set_route('Form', "Project", data.value);
-					frappe.show_alert(__("Duplicate project has been created"));
-				});
+						frappe.set_route('Form', "Project", data.value);
+						frappe.show_alert(__("Duplicate project has been created"));
+					});
 				resolve();
 			});
 		});
 	},
 
-	set_status: function(frm, status) {
+	set_status: function (frm, status) {
 		frappe.confirm(__('Set Project and all Tasks to status {0}?', [status.bold()]), () => {
 			frappe.xcall('erpnext.projects.doctype.project.project.set_project_status',
-				{project: frm.doc.name, status: status}).then(() => {
-				frm.reload_doc();
-			});
+				{ project: frm.doc.name, status: status }).then(() => {
+					frm.reload_doc();
+				});
 		});
 	},
-    
+
 });
 
 function open_form(frm, doctype, child_doctype, parentfield) {
@@ -198,36 +199,36 @@ function open_form(frm, doctype, child_doctype, parentfield) {
 
 }
 
-function loadFundsDashboard(frm){
-    if(!frm.is_new()){
-        frappe.call({
-            "method": "akf_projects.customizations.overrides.project.financial_stats.get_funds_detail",
-            // "method": "akf_projects.akf_projects.doctype.project.financial_stats.get_funds_detail",
-            "args": {
-                "project": frm.doc.name,
-                "total_fund_allocated": frm.doc.total_fund_allocated						
-            },
-            callback: function(r){
-                const data = r.message;
+function loadFundsDashboard(frm) {
+	if (!frm.is_new()) {
+		frappe.call({
+			"method": "akf_projects.customizations.overrides.project.financial_stats.get_funds_detail",
+			// "method": "akf_projects.akf_projects.doctype.project.financial_stats.get_funds_detail",
+			"args": {
+				"project": frm.doc.name,
+				"total_fund_allocated": frm.doc.total_fund_allocated
+			},
+			callback: function (r) {
+				const data = r.message;
 				frm.dashboard.refresh();
-                frm.dashboard.add_indicator(__('Allocated Funds: {0}',
-                [format_currency(data.allocated_fund)]), 'green');
-                frm.dashboard.add_indicator(__('Consumed Funds: {0}',
-                    [format_currency(data.consumed_fund)]),
-                'red');
-                }
-        });
-    }
+				frm.dashboard.add_indicator(__('Allocated Funds: {0}',
+					[format_currency(data.allocated_fund)]), 'green');
+				frm.dashboard.add_indicator(__('Consumed Funds: {0}',
+					[format_currency(data.consumed_fund)]),
+					'red');
+			}
+		});
+	}
 }
 
-function loadOpenStreetMap(){
+function loadOpenStreetMap() {
 	openStreetMapFunc(1);
 }
 
 function openStreetMapFunc(position) {
 	const latitude = cur_frm.doc.custom_latitude;
 	const longitude = cur_frm.doc.custom_longitude;
-	if ((latitude!="" && latitude!=undefined) && longitude!="" && longitude!=undefined) {
+	if ((latitude != "" && latitude != undefined) && longitude != "" && longitude != undefined) {
 		var curLocation = [latitude, longitude];
 		$("#map_id").empty();
 		$("#var_map").html(`<div id="map_id" style="height:400px"></div>`);
@@ -243,3 +244,56 @@ function openStreetMapFunc(position) {
 	}
 }
 
+function loadDonorsDashboard(frm) {
+	if (frm.is_new()) { return }
+	frm.set_df_property('custom_donors_table', "options",
+		`<div class="row">
+			<div class="col-xs-12">
+				<p>Not Found! </p>
+			</div>
+		</div>`
+	);
+
+	frappe.call({
+		method: "akf_projects.customizations.overrides.project.donors_detail.get_donors",
+		args: {
+			filters: {
+				"project_id": frm.doc.name,
+				"docstatus": 1
+			}
+		},
+		callback: function (r) {
+			let data = r.message;
+			let rows = ``;
+			let idx = 1
+			data.forEach(element => {
+				let log = moment(element.log).format("DD-MM-YYYY hh:mm:ss a")
+				rows += `
+					<tr>
+						<td>${idx}</td>
+						<th scope="row"><a href="/app/donor/${element.donor_id}">${element.donor_id}</a></th>
+						<td class="">${element.donor_name}</td>
+						<td><a href="/app/donation/${element.donation}">${element.donation}</a></td>
+						<td class="">${element.status}</td>
+					</tr>`;
+				idx += 1;
+			});
+			let _html_ = `
+				<table class="table">
+					<thead class="thead-dark">
+						<tr>
+						<th>#</th>
+						<th class="" scope="col">Donor ID</th>
+						<th class="" scope="col">Donor Name</th>
+						<th scope="col">Donation ID</th>
+						<th scope="col">Status</th>
+						</tr>
+					</thead>
+					<tbody>
+						${rows}
+					</tbody>
+				</table>`;
+			frm.set_df_property("custom_donors_table", "options", _html_);
+		}
+	})
+}

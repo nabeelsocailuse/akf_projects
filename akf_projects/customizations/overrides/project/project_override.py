@@ -112,10 +112,9 @@ class XProject(Project):
 		self.validate_from_to_dates("actual_start_date", "actual_end_date")
 		self.validate_payable() # Mubashir Bashir
 
-
-	def copy_from_template(self):	#Mubashir Bashir
+	def copy_from_template(self):  # Mubashir Bashir
 		"""
-		Copy tasks from template
+		Copy tasks from template based on custom_task_order.
 		"""
 		if self.project_template and not frappe.db.get_all("Task", dict(project=self.name), limit=1):
 
@@ -127,27 +126,62 @@ class XProject(Project):
 			if not self.project_type:
 				self.project_type = template.project_type
 
-			# create tasks from template
+			# Fetch tasks from the template and sort them by custom_task_order
+			template_tasks = sorted(template.tasks, key=lambda x: x.custom_task_order)
+
+			# Create tasks from template
 			project_tasks = []
 			tmp_task_details = []
-			task_order = 1
-			previous_task_end_date = None 
+			previous_task_end_date = None
 
-			for task in template.tasks:
+			for task in template_tasks:
 				template_task_details = frappe.get_doc("Task", task.task)
 				tmp_task_details.append(template_task_details)
-	
-				task = self.create_task_from_template(template_task_details, task_order, previous_task_end_date)
+
+				task = self.create_task_from_template(template_task_details, previous_task_end_date)
 				project_tasks.append(task)
 
 				previous_task_end_date = task.exp_end_date
-				task_order += 1
 
 			self.dependency_mapping(tmp_task_details, project_tasks)
 
 			self.expected_end_date = previous_task_end_date
 
-	def create_task_from_template(self, task_details, task_order, previous_task_end_date=None):	#Mubashir Bashir
+
+	# def copy_from_template(self):	#Mubashir Bashir
+	# 	"""
+	# 	Copy tasks from template
+	# 	"""
+	# 	if self.project_template and not frappe.db.get_all("Task", dict(project=self.name), limit=1):
+
+	# 		if not self.expected_start_date:
+	# 			self.expected_start_date = today()
+
+	# 		template = frappe.get_doc("Project Template", self.project_template)
+
+	# 		if not self.project_type:
+	# 			self.project_type = template.project_type
+
+	# 		# create tasks from template
+	# 		project_tasks = []
+	# 		tmp_task_details = []
+	# 		previous_task_end_date = None 
+
+	# 		for task in template.tasks:
+	# 			template_task_details = frappe.get_doc("Task", task.task)
+	# 			tmp_task_details.append(template_task_details)
+	
+	# 			task = self.create_task_from_template(template_task_details, previous_task_end_date)
+	# 			project_tasks.append(task)
+
+	# 			previous_task_end_date = task.exp_end_date
+
+	# 		self.dependency_mapping(tmp_task_details, project_tasks)
+
+	# 		self.expected_end_date = previous_task_end_date
+
+	# def create_task_from_template(self, task_details, task_order, previous_task_end_date=None):	#Mubashir Bashir
+	def create_task_from_template(self, task_details, previous_task_end_date=None):	#Mubashir Bashir
 
 		exp_start_date = self.calculate_start_date(task_details, previous_task_end_date)
 		exp_end_date = self.calculate_end_date(task_details, exp_start_date)
@@ -170,7 +204,7 @@ class XProject(Project):
 				color=task_details.color,
 				template_task=task_details.name,
 				priority=task_details.priority,
-				custom_task_order=task_order,
+				# custom_task_order=task_order,
 			)
 		).insert()
 

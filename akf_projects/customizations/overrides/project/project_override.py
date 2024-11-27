@@ -102,7 +102,6 @@ class XProject(Project):
 
 	def validate(self):
 		super(XProject, self).validate()
-		# frappe.msgprint("Project Override is working...")
 		if not self.is_new():
 			self.copy_from_template()
 		self.send_welcome_email()
@@ -436,23 +435,53 @@ class XProject(Project):
 
 	# Mubashir Bashir
 	def validate_payable(self):
-		if(self.status == 'Financial Close'):
-			payable_balance = self.get_project_payable_balance()['balance']
-			if(payable_balance > 0):
-				frappe.throw(_(f'Cannot complete the project because the payable account balance {payable_balance} is pending.'))
+		if self.status == 'Financial Close':
+			# Check Purchase Order
+			purchase_order_condition = frappe.db.exists(
+				"Purchase Order",
+				{
+					"project": self.name,
+					"status": ["in", ["To Receive and Bill", "To Bill", "To Receive"]],
+				},
+			)
+			# Check Purchase Receipt
+			purchase_receipt_condition = frappe.db.exists(
+				"Purchase Receipt",
+				{
+					"project": self.name,
+					"status": ["=", "To Bill"],
+				},
+			)
+			# Check Purchase Invoice
+			purchase_invoice_condition = frappe.db.exists(
+				"Purchase Invoice",
+				{
+					"project": self.name,
+					"status": ["in", ["Partly Paid", "Unpaid", "Overdue"]],
+				},
+			)
+			# If any condition is true, raise an exception
+			if purchase_order_condition or purchase_receipt_condition or purchase_invoice_condition:
+				frappe.throw('Cannot complete the project because the payable account balance is pending.')
 
-			
-	def get_project_payable_balance(self):
-		payable_balance = 0
-		gl_entries = frappe.get_all('GL Entry', 
-					filters={'project': self.name, 'docstatus': 1}, 
-					fields=['account', 'debit', 'credit'])
-		for entry in gl_entries:
-			account_type = frappe.db.get_value('Account', entry['account'], 'account_type')
+	# def validate_payable(self):
+	# 	if(self.status == 'Financial Close'):
+	# 		payable_balance = self.get_project_payable_balance()['balance']
+	# 		if(payable_balance > 0):
+	# 			frappe.throw(_(f'Cannot complete the project because the payable account balance {payable_balance} is pending.'))
+		
+	# def get_project_payable_balance(self):	# Mubashir 
+	# 	payable_balance = 0
+	# 	gl_entries = frappe.get_all('GL Entry', 
+	# 				filters={'project': self.name, 'docstatus': 1}, 
+	# 				fields=['account', 'debit', 'credit'])
+	# 	for entry in gl_entries:
+	# 		account_type = frappe.db.get_value('Account', entry['account'], 'account_type')
 
-			if(account_type == 'Payable'):
-				payable_balance += entry['credit'] - entry['debit']
-		return {'balance': payable_balance}
+	# 		if(account_type == 'Payable'):
+	# 			payable_balance += entry['credit'] - entry['debit']
+	# 	return {'balance': payable_balance}
+
 
 def get_timeline_data(doctype: str, name: str) -> dict[int, int]:
 	"""Return timeline for attendance"""

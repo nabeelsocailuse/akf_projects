@@ -216,6 +216,9 @@ function loadFundsDashboard(frm) {
 				frm.dashboard.add_indicator(__('Consumed Funds: {0}',
 					[format_currency(data.consumed_fund)]),
 					'red');
+				frm.dashboard.add_indicator(__('Pledge Funds: {0}',
+					[format_currency(data.pledge_fund)]),
+					'grey');
 			}
 		});
 	}

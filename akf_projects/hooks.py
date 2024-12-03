@@ -143,7 +143,7 @@ override_doctype_class = {
 scheduler_events = {
 	"cron" :{
 		"0 0 * * *": [
-            "akf_projects.akf_projects.doctype.survey_forms.survey_forms.fetch_api_data",
+            "akf_projects.akf_projects.doctype.project_survey_forms.project_survey_forms.fetch_api_data",
         ],
 	}
 # 	"all": [

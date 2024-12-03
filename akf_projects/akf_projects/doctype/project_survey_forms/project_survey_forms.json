@@ -1,0 +1,162 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "creation": "2024-11-28 17:43:16.380647",
+ "doctype": "DocType",
+ "engine": "InnoDB",
+ "field_order": [
+  "form_label",
+  "forms_data",
+  "html_content",
+  "record_id",
+  "form_id",
+  "other_info_section",
+  "start_time",
+  "id",
+  "status",
+  "submitted_by",
+  "region",
+  "project",
+  "column_break_jkwrz",
+  "end_time",
+  "version",
+  "validation_status",
+  "submission_time",
+  "district",
+  "tehsil",
+  "uc"
+ ],
+ "fields": [
+  {
+   "fieldname": "form_id",
+   "fieldtype": "Data",
+   "label": "Form ID"
+  },
+  {
+   "fieldname": "forms_data",
+   "fieldtype": "HTML",
+   "label": "Forms Data"
+  },
+  {
+   "fieldname": "form_label",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Form Name"
+  },
+  {
+   "fieldname": "html_content",
+   "fieldtype": "Long Text",
+   "hidden": 1,
+   "label": "HTML Content"
+  },
+  {
+   "fieldname": "record_id",
+   "fieldtype": "Data",
+   "label": "Record ID",
+   "unique": 1
+  },
+  {
+   "collapsible": 1,
+   "fieldname": "other_info_section",
+   "fieldtype": "Section Break",
+   "label": "Other Info"
+  },
+  {
+   "fieldname": "start_time",
+   "fieldtype": "Datetime",
+   "label": "Start Time"
+  },
+  {
+   "fieldname": "id",
+   "fieldtype": "Data",
+   "label": "ID"
+  },
+  {
+   "fieldname": "status",
+   "fieldtype": "Data",
+   "label": "Status"
+  },
+  {
+   "fieldname": "submitted_by",
+   "fieldtype": "Data",
+   "label": "Submitted By"
+  },
+  {
+   "fieldname": "column_break_jkwrz",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "end_time",
+   "fieldtype": "Datetime",
+   "label": "End Time"
+  },
+  {
+   "fieldname": "version",
+   "fieldtype": "Data",
+   "label": "Version"
+  },
+  {
+   "fieldname": "validation_status",
+   "fieldtype": "Data",
+   "label": "Validation Status"
+  },
+  {
+   "fieldname": "submission_time",
+   "fieldtype": "Datetime",
+   "label": "Submission Time"
+  },
+  {
+   "fieldname": "region",
+   "fieldtype": "Data",
+   "label": "Region",
+   "options": "Region"
+  },
+  {
+   "fieldname": "district",
+   "fieldtype": "Data",
+   "label": "District",
+   "options": "District"
+  },
+  {
+   "fieldname": "project",
+   "fieldtype": "Link",
+   "label": "Project",
+   "options": "Project"
+  },
+  {
+   "fieldname": "tehsil",
+   "fieldtype": "Data",
+   "label": "Tehsil"
+  },
+  {
+   "fieldname": "uc",
+   "fieldtype": "Data",
+   "label": "UC"
+  }
+ ],
+ "index_web_pages_for_search": 1,
+ "links": [],
+ "modified": "2024-12-03 12:45:08.421979",
+ "modified_by": "Administrator",
+ "module": "AKF Projects",
+ "name": "Project Survey Forms",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "search_fields": "record_id",
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": []
+}

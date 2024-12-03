@@ -1,5 +1,4 @@
-# Copyright (c) 2024, Nabeel Saleem and contributors
-# For license information, please see license.txt
+# Developer Mubashir Bashir
 
 import frappe
 import requests
@@ -8,10 +7,8 @@ from frappe.exceptions import DocumentLockedError
 
 from frappe.model.document import Document
 
-class SurveyForms(Document):
+class ProjectSurveyForms(Document):
 	pass
-
-
 
 @frappe.whitelist()
 def fetch_api_data():
@@ -64,10 +61,10 @@ def fetch_api_data():
                 validation_status = record.get('_validation_status')
                 submission_time = convert_to_datetime(record.get('_submission_time'))
                 submitted_by = record.get('_submitted_by')
-                region = record.get('Region') 
-                district = record.get('District')
-                tehsil = record.get('Tehsil') 
-                uc = record.get('UC')
+                region = record.get('Region') if record.get('Region') else "" 
+                district = record.get('District') if record.get('District') else "" 
+                tehsil = record.get('Tehsil') if record.get('Tehsil') else "" 
+                uc = record.get('UC') if record.get('UC') else "" 
                 
                 if not record_id:
                     continue
@@ -77,12 +74,20 @@ def fetch_api_data():
                 # Convert record to HTML table
                 html_table = generate_html_table_for_record(record)
 
-                # Check if a document with the same name (record_id) already exists
-                survey_form = frappe.get_doc('Survey Forms', record_id) if frappe.db.exists('Survey Forms', record_id) else frappe.new_doc('Survey Forms')
+                # # Check if a document with the same name (record_id) already exists
+                # survey_form = frappe.get_doc('Survey Forms Test', record_id) if frappe.db.exists('Survey Forms Test', record_id) else frappe.new_doc('Survey Forms Test')
                 
+                # Check if a record with the same `record_id` exists
+                existing_record = frappe.get_all('Project Survey Forms', filters={'record_id': record_id}, limit=1)
+                
+                if existing_record:
+                    survey_form = frappe.get_doc('Project Survey Forms', existing_record[0].name)
+                else:
+                    survey_form = frappe.new_doc('Project Survey Forms')
+
                 # Update or create the new document
                 survey_form.update({
-                    'name': record_id,
+                    # 'name': record_id,
                     'form_id': form_id,
                     'form_label': form_label,
                     'record_id': record_id,
@@ -172,52 +177,3 @@ def generate_html_table_for_record(record):
     html += "</tbody></table></div>"
     
     return html
-
-
-
-
-
-# Test Code for email generating
-
-def approval_email(self):
-    recipients = [self.student_email_id, self.submitting_to]
-    subject = """ Application approved."""
-    message = f""" 
-            <p>Dear <b>{self.first_name} {self.last_name if(self.last_name) else ''}</b>, Your application has been approved by the admission team.</p>
-            <p>Please with your concerned admission counselor for further details and processings.</p>
-            <p>//</p>
-            <p>Counselor Name: ABC </p>
-            <p>Contact: 090078601 </p>
-            <p>//</p>
-            <p>Best Regards,</p>
-            <p><b>Admission Team</b></p>.
-        """
-    attachments = [{
-        "print_format": "Student Applicant", 
-        "html": "", "print_format_attachment": 1, 
-        "doctype": self.doctype, 
-        "name": self.name, 
-        "lang": "en", 
-        "print_letterhead": "1"
-    },         
-    {
-        "print_format": "Welcome Student", 
-        "html": "", "print_format_attachment": 1, 
-        "doctype": self.doctype, 
-        "name": self.name, 
-        "lang": "en", 
-        "print_letterhead": "1"
-    }]
-    send_email(recipients, subject, message, attachments)
-    
-def send_email(recipients, subject, message, attachments):
-	frappe.sendmail(
-		recipients = recipients,
-		subject = subject,
-		message=message,
-		attachments= attachments,
-		# template="new_notification",
-		# args=args,
-		# header=[header, "orange"],
-		# now=frappe.flags.in_test,
-	)

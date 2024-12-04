@@ -62,6 +62,14 @@ frappe.ui.form.on("Project", {
 				filters: filters
 			};
 		});
+
+		frm.set_query('custom_survey_id', function(){		// Mubashir 4-12-24 
+			return {
+				filters: {
+					approval_status: 'Approved By Head Office'
+				}
+			};
+		});
 	},
 
 	refresh: function (frm) {

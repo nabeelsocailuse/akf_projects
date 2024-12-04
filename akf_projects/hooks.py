@@ -121,7 +121,8 @@ doctype_js = {
 
 override_doctype_class = {
 	# "Project": "akf_projects.customizations.extends.project.XProject"
-	"Project": "akf_projects.customizations.overrides.project.project_override.XProject"
+	"Project": "akf_projects.customizations.overrides.project.project_override.XProject",
+	"Task": "akf_projects.customizations.overrides.project.task_override.XTask"
 }
 
 

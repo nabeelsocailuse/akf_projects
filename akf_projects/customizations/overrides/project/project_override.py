@@ -109,6 +109,33 @@ class XProject(Project):
 		self.validate_from_to_dates("expected_start_date", "expected_end_date")
 		self.validate_from_to_dates("actual_start_date", "actual_end_date")
 		self.validate_payable() # Mubashir Bashir
+		self.update_survey_allocation() # Mubashir Bashir
+
+
+
+	def update_survey_allocation(self):  # Mubashir Bashir 3-12-24
+		# Fetch the previous value of custom_survey_id
+		previous_survey = frappe.db.get_value("Project", {"name": self.name}, "custom_survey_id")
+		
+		if self.custom_survey_id:
+			# If custom_survey_id is set, mark the survey as 'Allocated'
+			survey_form = frappe.get_doc("Project Survey Forms", self.custom_survey_id)
+			survey_form.allocation_status = "Allocated"
+			survey_form.save()
+		
+			# If there was a previous survey, mark it as 'Unallocated' (only if it's different)
+			if previous_survey and previous_survey != self.custom_survey_id:
+				previous_survey_form = frappe.get_doc("Project Survey Forms", previous_survey)
+				previous_survey_form.allocation_status = "Unallocated"
+				previous_survey_form.save()
+		else:
+			# If custom_survey_id is removed, mark the previous survey as 'Unallocated'
+			if previous_survey:
+				survey_form = frappe.get_doc("Project Survey Forms", previous_survey)
+				survey_form.allocation_status = "Unallocated"
+				survey_form.save()
+
+
 
 	def copy_from_template(self):  # Mubashir Bashir
 		"""

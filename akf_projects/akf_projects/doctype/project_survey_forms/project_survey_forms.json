@@ -15,16 +15,16 @@
   "id",
   "status",
   "submitted_by",
-  "region",
-  "project",
+  "district",
+  "tehsil",
   "column_break_jkwrz",
   "end_time",
   "version",
   "validation_status",
   "submission_time",
-  "district",
-  "tehsil",
-  "uc"
+  "region",
+  "uc",
+  "allocation_status"
  ],
  "fields": [
   {
@@ -118,12 +118,6 @@
    "options": "District"
   },
   {
-   "fieldname": "project",
-   "fieldtype": "Link",
-   "label": "Project",
-   "options": "Project"
-  },
-  {
    "fieldname": "tehsil",
    "fieldtype": "Data",
    "label": "Tehsil"
@@ -132,11 +126,19 @@
    "fieldname": "uc",
    "fieldtype": "Data",
    "label": "UC"
+  },
+  {
+   "default": "Unallocated",
+   "fieldname": "allocation_status",
+   "fieldtype": "Select",
+   "label": "Allocation Status",
+   "options": "Allocated\nUnallocated"
   }
  ],
+ "in_create": 1,
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2024-12-03 12:45:08.421979",
+ "modified": "2024-12-03 16:20:32.366720",
  "modified_by": "Administrator",
  "module": "AKF Projects",
  "name": "Project Survey Forms",

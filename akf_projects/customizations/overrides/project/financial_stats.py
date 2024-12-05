@@ -20,11 +20,12 @@ def get_funds_detail(project: str | None = None, total_fund_allocated: float | N
         }
 
 def get_allocated_amount(project):
-    return frappe.db.sql(f""" select ifnull(sum(credit),0)
-        from `tabGL Entry` gl
-        where is_cancelled=0
-            and account in (select name from `tabAccount` where disabled=0 and is_group=0 and account_type in ('Equity') and name=gl.account)
-            and project = '{project}' """)[0][0] or 0.0
+    return frappe.db.sql(f""" 
+        Select ifnull(sum(d.net_amount), 0) as net_amount
+        from `tabDonation`d  inner join `tabPayment Detail` p on (d.name=p.parent)
+        where 
+        d.docstatus=1
+        and p.project = '{project}' """)[0][0] or 0.0
 
 def get_consumed_amount(project):
     return frappe.db.get_value(

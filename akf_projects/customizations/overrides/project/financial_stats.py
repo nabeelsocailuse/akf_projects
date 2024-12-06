@@ -21,10 +21,11 @@ def get_funds_detail(project: str | None = None, total_fund_allocated: float | N
 
 def get_allocated_amount(project):
     return frappe.db.sql(f""" 
-        Select ifnull(sum(d.net_amount), 0) as net_amount
+        Select ifnull(sum(p.net_amount), 0) as net_amount
         from `tabDonation`d  inner join `tabPayment Detail` p on (d.name=p.parent)
         where 
         d.docstatus=1
+        and contribution_type='Donation'
         and p.project = '{project}' """)[0][0] or 0.0
 
 def get_consumed_amount(project):

@@ -17,6 +17,7 @@
   "submitted_by",
   "district",
   "tehsil",
+  "product",
   "column_break_jkwrz",
   "end_time",
   "version",
@@ -108,14 +109,12 @@
   {
    "fieldname": "region",
    "fieldtype": "Data",
-   "label": "Region",
-   "options": "Region"
+   "label": "Region"
   },
   {
    "fieldname": "district",
    "fieldtype": "Data",
-   "label": "District",
-   "options": "District"
+   "label": "District"
   },
   {
    "fieldname": "tehsil",
@@ -133,12 +132,17 @@
    "fieldtype": "Select",
    "label": "Allocation Status",
    "options": "Allocated\nUnallocated"
+  },
+  {
+   "fieldname": "product",
+   "fieldtype": "Data",
+   "label": "Product"
   }
  ],
  "in_create": 1,
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2024-12-03 16:20:32.366720",
+ "modified": "2024-12-08 23:11:53.867023",
  "modified_by": "Administrator",
  "module": "AKF Projects",
  "name": "Project Survey Forms",

@@ -51,6 +51,7 @@ def fetch_api_data():
             form_data = form_data_response.json()
                        
             for record in form_data.get('results', []):
+                record = {key.lower(): value for key, value in record.items()}
                 # Extract the record ID (_uuid) and other necessary fields
                 record_id = record.get('_uuid')
                 id = record.get('_id')
@@ -65,6 +66,7 @@ def fetch_api_data():
                 district = record.get('District') if record.get('District') else "" 
                 tehsil = record.get('Tehsil') if record.get('Tehsil') else "" 
                 uc = record.get('UC') if record.get('UC') else "" 
+                product = record.get('product') if record.get('product') else "" 
                 
                 if not record_id:
                     continue
@@ -104,6 +106,7 @@ def fetch_api_data():
                     'district': district,
                     'tehsil': tehsil,
                     'uc': uc,
+                    'product': product,
                 })
 
                 # Save the document to insert or update
@@ -117,7 +120,7 @@ def fetch_api_data():
                     frappe.db.rollback()
                     continue
 
-    print(f"Data fetched and {count} records inserted or updated in 'Survey Forms'.")
+    print(f"Data fetched and {count} records inserted or updated in 'Project Survey Forms'.")
 
 @frappe.whitelist()
 def convert_to_datetime(iso_datetime_str):

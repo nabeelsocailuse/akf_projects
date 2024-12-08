@@ -35,11 +35,12 @@ class XTask(Task):
         if donors:
             for donor in donors:
                 if donor.get("email"):
+                    project_name = frappe.db.get_value("Project", self.project, "project_name")
                     subject = f"Task Completed: {self.name}"
                     message = f"""
                                 Dear {donor.get("donor_name")}, <br><br>
                                 We are pleased to inform you that the task <b>{self.subject}</b> with 
-                                task id <b>{self.name}</b> in the project <b>{self.project}</b> have been 
+                                task id <b>{self.name}</b> in the project <b>{project_name}</b> have been 
                                 successfully created. <br><br>
                                 Thank you for for your continued support! <br><br>
                                 Best Regards,<br>
@@ -59,11 +60,12 @@ class XTask(Task):
             if donors:
                 for donor in donors:
                     if donor.get("email"):
+                        project_name = frappe.db.get_value("Project", self.project, "project_name")
                         subject = f"Task Completed: {self.name}"
                         message = f"""
                                     Dear {donor.get("donor_name")}, <br><br>
                                     We are pleased to inform you that the task <b>{self.subject}</b> with 
-                                    task id <b>{self.name}</b> in the project <b>{self.project}</b> have been 
+                                    task id <b>{self.name}</b> in the project <b>{project_name}</b> have been 
                                     successfully completed. <br><br>
                                     Thank you for for your continued support! <br><br>
                                     Best Regards,<br>

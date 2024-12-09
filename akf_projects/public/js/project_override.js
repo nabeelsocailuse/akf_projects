@@ -101,6 +101,10 @@ frappe.ui.form.on("Project", {
 			}, __("Actions"));
 
 			frm.trigger("set_project_status_button");
+			
+			frm.add_custom_button(__('Send Email Attachments'), () => {
+				frm.events.send_email_attachments(frm);
+			}, __("Actions"));
 
 
 			if (frappe.model.can_read("Task")) {
@@ -139,6 +143,24 @@ frappe.ui.form.on("Project", {
 
 		});
 	},
+
+	send_email_attachments: function (frm) {
+		frappe.call({
+			method: "akf_projects.customizations.overrides.project.project_override.send_email_attachments",
+			args: { self: frm.doc },
+			freeze: true,
+			freeze_message: __('Sending email to project users...'),
+			callback: function (r) {
+				if (r && !r.exc) {
+					frappe.msgprint(__('Email sent successfully to project users.'));
+					frm.refresh();
+				} else {
+					frappe.msgprint(__('An error occurred while sending the email.'));
+				}
+			}
+		});
+	},
+	
 
 	set_project_status_button: function (frm) {
 		frm.add_custom_button(__('Set Project Status'), () => {
@@ -219,12 +241,12 @@ function loadFundsDashboard(frm) {
 			callback: function (r) {
 				const data = r.message;
 				frm.dashboard.refresh();
-				frm.dashboard.add_indicator(__('Allocated Funds: {0}',
+				frm.dashboard.add_indicator(__('Total Allocated Funds: {0}',
 					[format_currency(data.allocated_fund)]), 'green');
 				frm.dashboard.add_indicator(__('Consumed Funds: {0}',
 					[format_currency(data.consumed_fund)]),
 					'red');
-				frm.dashboard.add_indicator(__('Pledge Amount: <small>({0} - {1}) = {2}</small>',
+				frm.dashboard.add_indicator(__('Pledge Amount: {2}',
 					[format_currency(data.unpaid_pledge), format_currency(data.paid_pledge), format_currency(data.remaining_pledge)]),
 					'grey');
 			}

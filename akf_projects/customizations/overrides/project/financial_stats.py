@@ -20,13 +20,24 @@ def get_funds_detail(project: str | None = None, total_fund_allocated: float | N
         }
 
 def get_allocated_amount(project):
-    return frappe.db.sql(f""" 
-        Select ifnull(sum(p.net_amount), 0) as net_amount
-        from `tabDonation`d  inner join `tabPayment Detail` p on (d.name=p.parent)
-        where 
-        d.docstatus=1
-        and contribution_type='Donation'
-        and p.project = '{project}' """)[0][0] or 0.0
+    
+    result = frappe.db.sql(f""" 
+        Select 
+            sum(distinct gl.credit) credit,  sum(distinct gl.debit) debit
+        From 
+            `tabGL Entry` gl, `tabDonation` d, `tabFunds Transfer` ft
+        Where 
+            (gl.voucher_no = d.name or gl.voucher_no = ft.name)
+            and d.contribution_type ='Donation'
+            and gl.is_cancelled=0
+            and voucher_type  in ('Donation', 'Funds Transfer')
+            and gl.account in (select name from `tabAccount` where disabled=0 and account_type='Equity' and name=gl.account)
+            and gl.project='{project}'
+        Group By
+          gl.name
+        """, as_dict=1)
+    
+    return sum((d.credit-d.debit) for d in result)
 
 def get_consumed_amount(project):
     return frappe.db.get_value(

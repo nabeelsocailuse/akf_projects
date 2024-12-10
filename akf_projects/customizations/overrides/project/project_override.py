@@ -3,6 +3,7 @@
 
 
 import frappe
+import json
 from email_reply_parser import EmailReplyParser
 from frappe import _, qb
 from frappe.desk.reportview import get_match_cond
@@ -172,38 +173,6 @@ class XProject(Project):
 
 			self.expected_end_date = previous_task_end_date
 
-
-	# def copy_from_template(self):	#Mubashir Bashir
-	# 	"""
-	# 	Copy tasks from template
-	# 	"""
-	# 	if self.project_template and not frappe.db.get_all("Task", dict(project=self.name), limit=1):
-
-	# 		if not self.expected_start_date:
-	# 			self.expected_start_date = today()
-
-	# 		template = frappe.get_doc("Project Template", self.project_template)
-
-	# 		if not self.project_type:
-	# 			self.project_type = template.project_type
-
-	# 		# create tasks from template
-	# 		project_tasks = []
-	# 		tmp_task_details = []
-	# 		previous_task_end_date = None 
-
-	# 		for task in template.tasks:
-	# 			template_task_details = frappe.get_doc("Task", task.task)
-	# 			tmp_task_details.append(template_task_details)
-	
-	# 			task = self.create_task_from_template(template_task_details, previous_task_end_date)
-	# 			project_tasks.append(task)
-
-	# 			previous_task_end_date = task.exp_end_date
-
-	# 		self.dependency_mapping(tmp_task_details, project_tasks)
-
-	# 		self.expected_end_date = previous_task_end_date
 
 	# def create_task_from_template(self, task_details, task_order, previous_task_end_date=None):	#Mubashir Bashir
 	def create_task_from_template(self, task_details, previous_task_end_date=None):	#Mubashir Bashir
@@ -477,7 +446,211 @@ class XProject(Project):
 			if(account_type == 'Payable'):
 				payable_balance += entry['credit'] - entry['debit']
 		return {'balance': payable_balance}
+		
 
+
+@frappe.whitelist()
+def send_project_completion_report(doc):   #Mubashir Bashir
+	doc = json.loads(doc)
+	donors = frappe.db.sql("""
+		SELECT 
+			pd.donor_name, 
+			pd.email
+		FROM 
+			`tabDonation` d 
+		INNER JOIN 
+			`tabPayment Detail` pd 
+		ON 
+			d.name = pd.parent
+		WHERE 
+			d.is_return = 0
+			AND d.docstatus = 1
+			AND pd.project_id = %s
+		GROUP BY 
+			pd.donor_name, pd.email
+	""", (doc.get('name'),), as_dict=1)
+	if donors:
+		for donor in donors:
+			if donor.get("email"):
+				subject = "Project Completion Report"
+				message = f"""
+							Dear {donor.get("donor_name")}, <br><br>
+							<p>We are delighted to inform you that the {doc.get("project_name")} has been successfully completed, thanks to your invaluable support and generosity.</p>
+							
+							<p>Please find attached the Project Completion Report, which provides a comprehensive overview of the project's objectives, activities, outcomes, 
+							and overall impact. The report highlights key achievements, lessons learned, and how the project has contributed to the intended goals. We have also 
+							included financial details to ensure full transparency regarding resource utilization.</p>
+
+							<p>Your contribution has made a significant difference, and the success of this project would not have been possible without your trust and encouragement. 
+							If you have any feedback or need further clarification, we would be happy to address it.</p>
+
+							<p>Thank you once again for being an integral part of this journey. We look forward to your continued partnership in future endeavors.</p><br>
+							Best Regards,<br>
+							{doc.get('company')}
+							"""
+				# pdf = frappe.get_print(doc.get("doctype"), doc.get("name"), print_format="Project Completion Report")
+
+                # # Prepare the attachment
+				# attachments = [
+				# 	{
+				# 		"fname": f"Project_Completion_Report_{doc.get('name')}.pdf",
+				# 		"fcontent": pdf,
+				# 		# "is_private": 1 
+				# 	}
+				# ]
+				attachments = [            
+					{
+						"print_format": "Project Completion Report",
+						"html": "",
+						"print_format_attachment": 1,
+						"doctype": doc.get("doctype"),
+						"name": doc.get("name"),
+						"lang": "en",
+						"print_letterhead": "1"
+					}
+				]
+				
+				frappe.sendmail(
+					recipients = donor.get('email'),
+					subject = subject,
+					message = message,
+					attachments=attachments
+				)
+
+@frappe.whitelist()
+def send_project_progress_report(doc):   #Mubashir Bashir
+	doc = json.loads(doc)
+	donors = frappe.db.sql("""
+		SELECT 
+			pd.donor_name, 
+			pd.email
+		FROM 
+			`tabDonation` d 
+		INNER JOIN 
+			`tabPayment Detail` pd 
+		ON 
+			d.name = pd.parent
+		WHERE 
+			d.is_return = 0
+			AND d.docstatus = 1
+			AND pd.project_id = %s
+		GROUP BY 
+			pd.donor_name, pd.email
+	""", (doc.get('name'),), as_dict=1)
+	if donors:
+		for donor in donors:
+			if donor.get("email"):
+				subject = "Project Progress Report"
+				message = f"""
+							Dear {donor.get("donor_name")}, <br><br>
+							<p>I hope this email finds you in good health and high spirits.</p>
+							
+							<p>We are pleased to share the latest progress report for the {doc.get("project_name")}, 
+							attached for your review. The report provides detailed insights into the milestones achieved, 
+							activities completed, and upcoming plans.</p>
+
+							<p>We remain deeply grateful for your generous support and commitment, which makes this progress possible. 
+							Should you have any questions or require additional details, please do not hesitate to reach out.</p>
+
+							<p>Thank you once again for your trust in our work.</p><br>
+							Best Regards,<br>
+							{doc.get('company')}
+							"""
+				# pdf = frappe.get_print(doc.get("doctype"), doc.get("name"), print_format="Project Completion Report")
+
+                # # Prepare the attachment
+				# attachments = [
+				# 	{
+				# 		"fname": f"Project_Completion_Report_{doc.get('name')}.pdf",
+				# 		"fcontent": pdf,
+				# 		# "is_private": 1 
+				# 	}
+				# ]
+				attachments = [            
+					{
+						"print_format": "Project Progress Report",
+						"html": "",
+						"print_format_attachment": 1,
+						"doctype": doc.get("doctype"),
+						"name": doc.get("name"),
+						"lang": "en",
+						"print_letterhead": "1"
+					}
+				]
+				
+				frappe.sendmail(
+					recipients = donor.get('email'),
+					subject = subject,
+					message = message,
+					attachments=attachments
+				)
+
+
+
+# @frappe.whitelist()
+# def send_email_attachments(doc):
+#     # Convert string to dictionary
+#     doc = json.loads(doc)
+
+#     project_users = frappe.get_all(
+#         "Project User",
+#         filters={"parent": doc.get("name"), "parenttype": "Project"},
+#         fields=["email", "full_name"]
+#     )
+
+#     recipients = [{'email': user.email, 'full_name': user.full_name} for user in project_users if frappe.utils.validate_email_address(user.email)]
+#     if not recipients:
+#         frappe.throw(_("No valid email addresses found in the project's user list."))
+
+#     subject = "Attachments"
+
+#     # Iterate over recipients and send personalized emails
+#     for recipient in recipients:
+#         full_name = recipient['full_name'] or "Team"
+#         message = f""" 
+#             <p>Dear {full_name},</p>
+#             <p>Please review the attached documents for more details.</p>
+#             <p>Best Regards,</p>
+#             <p><b>{doc.get('company')}</b></p>.
+#         """
+
+#         # Attachments for email
+#         attachments = [
+#             {
+#                 "print_format": "Project Progress Report",
+#                 "html": "",
+#                 "print_format_attachment": 1,
+#                 "doctype": doc.get("doctype"),
+#                 "name": doc.get("name"),
+#                 "lang": "en",
+#                 "print_letterhead": "1"
+#             },
+#             {
+#                 "print_format": "Project Completion Report",
+#                 "html": "",
+#                 "print_format_attachment": 1,
+#                 "doctype": doc.get("doctype"),
+#                 "name": doc.get("name"),
+#                 "lang": "en",
+#                 "print_letterhead": "1"
+#             }
+#         ]
+
+#         # Sending email
+#         try:
+#             frappe.sendmail(
+#                 recipients=[recipient['email']],
+#                 subject=subject,
+#                 message=message,
+#                 attachments=attachments
+#             )
+#         except Exception as e:
+#             frappe.log_error(message=str(e), title="Send Email to Project User Failed")
+#             frappe.throw(_("An error occurred while sending the email to {0}. Please check the error log for details.").format(full_name))
+    
+#     frappe.msgprint(_("Emails sent successfully to project users."))
+
+		
 
 def get_timeline_data(doctype: str, name: str) -> dict[int, int]:
 	"""Return timeline for attendance"""
@@ -898,3 +1071,8 @@ def recalculate_project_total_purchase_cost(project: str | None = None):
 			"total_purchase_cost",
 			(total_purchase_cost and total_purchase_cost[0][0] or 0),
 		)
+
+
+
+
+    

@@ -102,8 +102,12 @@ frappe.ui.form.on("Project", {
 
 			frm.trigger("set_project_status_button");
 			
-			frm.add_custom_button(__('Send Email Attachments'), () => {
-				frm.events.send_email_attachments(frm);
+			frm.add_custom_button(__('Send Project Progress Report'), () => {
+				frm.events.send_project_progress_report(frm);
+			}, __("Actions"));
+			
+			frm.add_custom_button(__('Send Project Completion Report'), () => {
+				frm.events.send_project_completion_report(frm);
 			}, __("Actions"));
 
 
@@ -144,15 +148,32 @@ frappe.ui.form.on("Project", {
 		});
 	},
 
-	send_email_attachments: function (frm) {
+	send_project_completion_report: function (frm) {
 		frappe.call({
-			method: "akf_projects.customizations.overrides.project.project_override.send_email_attachments",
-			args: { self: frm.doc },
+			method: "akf_projects.customizations.overrides.project.project_override.send_project_completion_report",
+			args: { doc: frm.doc },
 			freeze: true,
-			freeze_message: __('Sending email to project users...'),
+			freeze_message: __('Sending email to project donors...'),
 			callback: function (r) {
 				if (r && !r.exc) {
-					frappe.msgprint(__('Email sent successfully to project users.'));
+					frappe.msgprint(__('Email sent successfully to project donors.'));
+					frm.refresh();
+				} else {
+					frappe.msgprint(__('An error occurred while sending the email.'));
+				}
+			}
+		});
+	},
+
+	send_project_progress_report: function (frm) {
+		frappe.call({
+			method: "akf_projects.customizations.overrides.project.project_override.send_project_progress_report",
+			args: { doc: frm.doc },
+			freeze: true,
+			freeze_message: __('Sending email to project donors...'),
+			callback: function (r) {
+				if (r && !r.exc) {
+					frappe.msgprint(__('Email sent successfully to project donors.'));
 					frm.refresh();
 				} else {
 					frappe.msgprint(__('An error occurred while sending the email.'));

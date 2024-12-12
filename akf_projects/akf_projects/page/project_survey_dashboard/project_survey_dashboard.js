@@ -17,7 +17,6 @@ frappe.pages['project-survey-dashboard'].on_page_load = function(wrapper) {
     });
 
     server_call.fetch_data(page);
-
 };
 
 
@@ -27,6 +26,7 @@ server_call = {
             method: "akf_projects.akf_projects.page.project_survey_dashboard.project_survey_dashboard.get_information",
             args: {},
             callback: function(r) {
+				
                 var info = r.message;
                 console.log(info);
 
@@ -38,6 +38,7 @@ server_call = {
 
                 _highcharts_.load_charts(info);
                 // console.log(r.message);
+
             },
         });
     },

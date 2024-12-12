@@ -1,7 +1,6 @@
 #main-dashboard
 import frappe
 from frappe import _
-from frappe.utils import getdate, add_days, nowdate
 
 
 @frappe.whitelist(allow_guest=True)

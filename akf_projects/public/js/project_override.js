@@ -253,23 +253,37 @@ function open_form(frm, doctype, child_doctype, parentfield) {
 function loadFundsDashboard(frm) {
 	if (!frm.is_new()) {
 		frappe.call({
-			"method": "akf_projects.customizations.overrides.project.financial_stats.get_funds_detail",
+			"method": "akf_projects.customizations.overrides.project.financial_stats.get_transactions",
 			// "method": "akf_projects.akf_projects.doctype.project.financial_stats.get_funds_detail",
 			"args": {
-				"project": frm.doc.name,
-				"total_fund_allocated": frm.doc.total_fund_allocated
+				filters:{"project": frm.doc.name,}
+				// "total_fund_allocated": frm.doc.total_fund_allocated
 			},
 			callback: function (r) {
 				const data = r.message;
+				console.log(data);
 				frm.dashboard.refresh();
-				frm.dashboard.add_indicator(__('Total Allocated Funds: {0}',
-					[format_currency(data.allocated_fund)]), 'green');
-				frm.dashboard.add_indicator(__('Consumed Funds: {0}',
-					[format_currency(data.consumed_fund)]),
-					'red');
-				frm.dashboard.add_indicator(__('Pledge Amount: {2}',
-					[format_currency(data.unpaid_pledge), format_currency(data.paid_pledge), format_currency(data.remaining_pledge)]),
+				
+				frm.dashboard.add_indicator(__('Total Allocation: {0}',
+					[format_currency(data.total_allocation)]), 'green');
+				
+				frm.dashboard.add_indicator(__('Pledge Amount: {0}',
+					[format_currency(data.total_pledge)]),
+					'yellow');
+				frm.dashboard.add_indicator(__('Transfered Funds: {0}',
+					[format_currency(data.transfered_funds)]),
 					'grey');
+				frm.dashboard.add_indicator(__('Received Funds: {0}',
+					[format_currency(data.received_funds)]),
+					'green');
+				frm.dashboard.add_indicator(__('Consumed Funds: {0}',
+					[format_currency(data.total_purchase)]),
+					'red');
+				
+				frm.dashboard.add_indicator(__('Remaining Amount: {0}',
+					[format_currency(data.remaining_amount)]),
+					'blue');
+				
 			}
 		});
 	}

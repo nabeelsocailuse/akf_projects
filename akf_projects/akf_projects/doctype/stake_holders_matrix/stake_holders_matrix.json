@@ -1,0 +1,78 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "creation": "2024-12-26 19:13:38.612892",
+ "doctype": "DocType",
+ "engine": "InnoDB",
+ "field_order": [
+  "project_id",
+  "column_break_btug",
+  "project_name",
+  "internal_stake_holders_section",
+  "internal_stake_holder",
+  "external_stake_holders_section",
+  "external_stake_holder"
+ ],
+ "fields": [
+  {
+   "fieldname": "project_id",
+   "fieldtype": "Link",
+   "label": "Project Id",
+   "options": "Project"
+  },
+  {
+   "fetch_from": "project_id.project_name",
+   "fieldname": "project_name",
+   "fieldtype": "Data",
+   "label": "Project Name"
+  },
+  {
+   "fieldname": "column_break_btug",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "internal_stake_holders_section",
+   "fieldtype": "Section Break",
+   "label": "Internal Stake Holders"
+  },
+  {
+   "fieldname": "internal_stake_holder",
+   "fieldtype": "Table",
+   "options": "Internal Stake Holders"
+  },
+  {
+   "fieldname": "external_stake_holders_section",
+   "fieldtype": "Section Break",
+   "label": "External Stake Holders"
+  },
+  {
+   "fieldname": "external_stake_holder",
+   "fieldtype": "Table",
+   "options": "External Stake Holders"
+  }
+ ],
+ "index_web_pages_for_search": 1,
+ "links": [],
+ "modified": "2024-12-27 10:04:58.157829",
+ "modified_by": "Administrator",
+ "module": "AKF Projects",
+ "name": "Stake Holders Matrix",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": []
+}

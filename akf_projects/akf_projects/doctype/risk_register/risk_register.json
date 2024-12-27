@@ -1,0 +1,172 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "creation": "2024-12-26 17:56:48.710636",
+ "doctype": "DocType",
+ "engine": "InnoDB",
+ "field_order": [
+  "section_break_hksb",
+  "section_break_fcoa",
+  "source",
+  "category",
+  "status",
+  "column_break_lzts",
+  "risk_owner",
+  "strategy",
+  "project_id",
+  "section_break_mqzx",
+  "description",
+  "column_break_alpz",
+  "mitigation_plan",
+  "column_break_yavc",
+  "contigency_plan",
+  "column_break_j7xa",
+  "remarks",
+  "section_break_pfwc",
+  "severity",
+  "column_break_5rvd",
+  "likelihood",
+  "column_break_fqa5",
+  "rating"
+ ],
+ "fields": [
+  {
+   "fieldname": "section_break_hksb",
+   "fieldtype": "Data",
+   "label": "Risk Description"
+  },
+  {
+   "fieldname": "source",
+   "fieldtype": "Select",
+   "label": "Source",
+   "options": "\nClient\nConsultant\nDevelopment\nManagement\nSystem\nConfiguration\nLesson Learnt"
+  },
+  {
+   "fieldname": "category",
+   "fieldtype": "Select",
+   "label": "Category",
+   "options": "\nName of Process Areas\nTraining\nTools\nAdministration\nEmployee reluctance\nCommunication\nClient commitments"
+  },
+  {
+   "fieldname": "status",
+   "fieldtype": "Select",
+   "label": "Status",
+   "options": "\nNew\nOccurred\nClosed"
+  },
+  {
+   "fieldname": "risk_owner",
+   "fieldtype": "Link",
+   "label": "Risk Owner",
+   "options": "User"
+  },
+  {
+   "fieldname": "strategy",
+   "fieldtype": "Select",
+   "label": "Strategy",
+   "options": "\nMitigate\nAccept\nTransfer\nAvoid"
+  },
+  {
+   "fieldname": "project_id",
+   "fieldtype": "Link",
+   "label": "Project ID",
+   "options": "Project"
+  },
+  {
+   "fieldname": "description",
+   "fieldtype": "Small Text",
+   "label": "Description"
+  },
+  {
+   "fieldname": "mitigation_plan",
+   "fieldtype": "Small Text",
+   "label": "Mitigation Plan"
+  },
+  {
+   "fieldname": "remarks",
+   "fieldtype": "Small Text",
+   "label": "Remarks"
+  },
+  {
+   "fieldname": "severity",
+   "fieldtype": "Select",
+   "label": "Severity",
+   "options": "\n1\n2\n3\n4\n5\n6\n7\n8\n9\n10"
+  },
+  {
+   "fieldname": "likelihood",
+   "fieldtype": "Select",
+   "label": "Likelihood",
+   "options": "\n1\n2\n3\n4\n5\n6\n7\n8\n9\n10"
+  },
+  {
+   "fieldname": "rating",
+   "fieldtype": "Data",
+   "label": "Rating"
+  },
+  {
+   "fieldname": "column_break_lzts",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "section_break_mqzx",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "contigency_plan",
+   "fieldtype": "Small Text",
+   "label": "Contigency Plan"
+  },
+  {
+   "fieldname": "column_break_alpz",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "column_break_yavc",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "section_break_pfwc",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "section_break_fcoa",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "column_break_j7xa",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "column_break_5rvd",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "column_break_fqa5",
+   "fieldtype": "Column Break"
+  }
+ ],
+ "index_web_pages_for_search": 1,
+ "links": [],
+ "modified": "2024-12-26 18:33:54.540815",
+ "modified_by": "Administrator",
+ "module": "AKF Projects",
+ "name": "Risk Register",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": []
+}

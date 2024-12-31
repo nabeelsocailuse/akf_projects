@@ -6,6 +6,7 @@ frappe.ui.form.on("Project Survey Forms", {
 	// }
 	onload: function(frm) {
         render_form_data(frm);
+        frm.save();
     }
 });
 

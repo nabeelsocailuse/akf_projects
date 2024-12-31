@@ -7,7 +7,6 @@
  "field_order": [
   "form_label",
   "forms_data",
-  "html_content",
   "record_id",
   "form_id",
   "other_info_section",
@@ -17,7 +16,9 @@
   "submitted_by",
   "district",
   "tehsil",
+  "village",
   "product",
+  "latitude",
   "column_break_jkwrz",
   "end_time",
   "version",
@@ -25,7 +26,9 @@
   "submission_time",
   "region",
   "uc",
-  "allocation_status"
+  "allocation_status",
+  "longitude",
+  "survey_form_json"
  ],
  "fields": [
   {
@@ -43,12 +46,6 @@
    "fieldtype": "Data",
    "in_list_view": 1,
    "label": "Form Name"
-  },
-  {
-   "fieldname": "html_content",
-   "fieldtype": "Long Text",
-   "hidden": 1,
-   "label": "HTML Content"
   },
   {
    "fieldname": "record_id",
@@ -137,12 +134,33 @@
    "fieldname": "product",
    "fieldtype": "Data",
    "label": "Product"
+  },
+  {
+   "fieldname": "survey_form_json",
+   "fieldtype": "JSON",
+   "hidden": 1,
+   "label": "Survey Form Json",
+   "read_only": 1
+  },
+  {
+   "fieldname": "longitude",
+   "fieldtype": "Data",
+   "label": "Longitude"
+  },
+  {
+   "fieldname": "latitude",
+   "fieldtype": "Data",
+   "label": "Latitude"
+  },
+  {
+   "fieldname": "village",
+   "fieldtype": "Data",
+   "label": "Village"
   }
  ],
- "in_create": 1,
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2024-12-08 23:11:53.867023",
+ "modified": "2024-12-31 17:24:08.676049",
  "modified_by": "Administrator",
  "module": "AKF Projects",
  "name": "Project Survey Forms",

@@ -70,13 +70,16 @@ def fetch_api_data():
                     geolocation = record.get('_geolocation')
                     latitude = geolocation[0] if len(geolocation) >= 1 else None
                     longitude = geolocation[1] if len(geolocation) >= 2 else None
+                    
+                    json_string = json.dumps(record, indent=None, separators=(',', ':'))
 
                     # Prepare document data
                     doc_data = {
                         'form_id': form_id,
                         'form_label': form_label,
                         'record_id': record_id,
-                        'survey_form_json': frappe.as_json(record),
+                        # 'survey_form_json': frappe.as_json(record),
+                        'survey_form_json': json_string,
                         'id': record.get('_id'),
                         'start_time': convert_to_datetime(record.get('start')),
                         'end_time': convert_to_datetime(record.get('end')),
@@ -122,6 +125,7 @@ def fetch_api_data():
 
             # Commit after each form's records are processed
             frappe.db.commit()
+            # return
 
         print(
             f"Data fetched successfully:\n"
@@ -129,6 +133,7 @@ def fetch_api_data():
             f"- {count_forms} forms processed\n"
             f"- {count_failed} forms failed to fetch"
         )
+        # return
 
     except Exception as e:
         frappe.db.rollback()
@@ -152,84 +157,75 @@ def convert_to_datetime(iso_datetime_str):
             print(f"Error parsing datetime string: {iso_datetime_str} -> {e}")
             return None
 
-
 @frappe.whitelist()
 def generate_html_table_for_record(json_data):
     """
     Generates an HTML table for a single record.
     """
     try:
-        # Convert string JSON to dict if needed
+        # Convert string to dict if needed
         if isinstance(json_data, str):
-            json_data = frappe.parse_json(json_data)
-            
-        if not isinstance(json_data, dict):
+            record = json.loads(json_data)
+        else:
+            record = json_data
+
+        if not isinstance(record, dict):
             return "<p>No valid data available for this record.</p>"
 
-        # CSS styles
-        styles = """
-            <style>
-                .survey-table-container {
-                    overflow: auto;
-                    max-width: 100%;
-                    max-height: 500px;
-                    border: 1px solid #ddd;
-                    padding: 10px;
-                    margin: 10px 0;
-                }
-                .survey-table {
-                    border-collapse: collapse;
-                    width: 100%;
-                    font-size: 13px;
-                }
-                .survey-table th {
-                    background-color: #f8f9fa;
-                    padding: 8px;
-                    text-align: left;
-                    border: 1px solid #ddd;
-                }
-                .survey-table td {
-                    padding: 8px;
-                    border: 1px solid #ddd;
-                    word-break: break-word;
-                }
-                .survey-table tr:nth-child(even) {
-                    background-color: #f9f9f9;
-                }
-                .attachment-link {
-                    display: inline-block;
-                    margin: 2px 0;
-                    color: #0066cc;
-                    text-decoration: none;
-                }
-                .attachment-link:hover {
-                    text-decoration: underline;
-                }
-            </style>
+        # Initialize HTML table with better styling
+        html = """
+        <style>
+            .survey-table-container {
+                max-height: 600px;
+                overflow-y: auto;
+                margin: 10px 0;
+            }
+            .survey-table {
+                width: 100%;
+                border-collapse: collapse;
+                font-size: 13px;
+            }
+            .survey-table th {
+                background-color: #f8f9fa;
+                position: sticky;
+                top: 0;
+                z-index: 1;
+            }
+            .survey-table th, .survey-table td {
+                padding: 8px;
+                border: 1px solid #ddd;
+                text-align: left;
+            }
+            .survey-table tr:nth-child(even) {
+                background-color: #f9f9f9;
+            }
+            .attachment-link {
+                color: #0366d6;
+                text-decoration: none;
+                display: block;
+                margin: 2px 0;
+            }
+            .attachment-link:hover {
+                text-decoration: underline;
+            }
+        </style>
+        <div class="survey-table-container">
+            <table class="survey-table">
+                <thead>
+                    <tr>
+                        <th>Field</th>
+                        <th>Value</th>
+                    </tr>
+                </thead>
+                <tbody>
         """
 
-        # Initialize HTML table with styles
-        html = f"""
-            {styles}
-            <div class="survey-table-container">
-                <table class="survey-table">
-                    <thead>
-                        <tr>
-                            <th>Field</th>
-                            <th>Value</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-        """
-
-        # Process and sort fields
-        for key in sorted(json_data.keys()):
-            value = json_data[key]
-            
+        # Process each field
+        for key, value in record.items():
             # Format field name
-            display_key = key.replace('_', ' ').strip().title()
+            field_name = key.replace('_', ' ').strip().title()
 
-            # Special handling for attachments
+            # Handle attachments
             if key == "_attachments" and isinstance(value, list):
                 links = []
                 for attachment in value:
@@ -238,30 +234,29 @@ def generate_html_table_for_record(json_data):
                     mimetype = attachment.get("mimetype", "")
                     
                     if download_url:
-                        icon = "📄"  # Default icon
+                        icon = "📄"
                         if mimetype.startswith("image/"):
                             icon = "🖼️"
                         elif mimetype.startswith("video/"):
                             icon = "🎥"
-                            
+                        
                         links.append(
                             f'<a href="{download_url}" target="_blank" '
                             f'class="attachment-link">{icon} {filename}</a>'
                         )
-                value = "<br>".join(links)
-
-            # Handle other data types
-            elif isinstance(value, list):
-                value = ', '.join(map(str, value))
-            elif isinstance(value, dict):
-                value = '<br>'.join(f"{k}: {v}" for k, v in value.items())
+                value = "".join(links)
+            # Handle geolocation
+            elif key == "_geolocation" and isinstance(value, list):
+                value = f"Latitude: {value[0]}, Longitude: {value[1]}" if len(value) >= 2 else ""
+            # Handle other types
+            elif isinstance(value, (list, dict)):
+                value = json.dumps(value, indent=2)
             elif value is None:
                 value = ""
             else:
                 value = str(value)
 
-            # Add row to table
-            html += f"<tr><td>{display_key}</td><td>{value}</td></tr>"
+            html += f"<tr><td>{field_name}</td><td>{value}</td></tr>"
 
         html += "</tbody></table></div>"
         return html
@@ -269,5 +264,23 @@ def generate_html_table_for_record(json_data):
     except Exception as e:
         frappe.log_error(f"Error generating HTML table: {str(e)}")
         return f"<p>Error generating table: {str(e)}</p>"
-    
+
+
+@frappe.whitelist()
+def empty_survey_form_json():
+    """
+    This function empties the 'survey_form_json' field in the 'Project Survey Forms' doctype.
+    """
+    try:
+        frappe.db.sql("""
+            UPDATE `tabProject Survey Forms`
+            SET survey_form_json = NULL
+        """)
+        frappe.db.commit()
+
+        print("Successfully emptied the 'survey_form_json' field in 'Project Survey Forms'.")
+    except Exception as e:
+        print(f"An error occurred: {e}")
+
+
 # bench --site al-khidmat.com execute akf_projects.akf_projects.doctype.project_survey_forms.project_survey_forms.fetch_api_data

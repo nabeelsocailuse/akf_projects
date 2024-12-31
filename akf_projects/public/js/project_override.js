@@ -284,6 +284,9 @@ function loadFundsDashboard(frm) {
 					[format_currency(data.remaining_amount)]),
 					'blue');
 				
+				frm.set_value("custom_budget_allocated", format_currency(data.total_allocation));
+				frm.set_value("custom_amount_spent", format_currency(data.total_purchase));
+				frm.set_value("custom_remaining_budget", format_currency(data.remaining_amount));
 			}
 		});
 	}

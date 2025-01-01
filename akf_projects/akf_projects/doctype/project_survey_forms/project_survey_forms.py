@@ -90,7 +90,7 @@ def fetch_api_data():
                         'submission_time': convert_to_datetime(record.get('_submission_time')),
                         'region': record.get('region', ''),
                         'district': record.get('district', ''),
-                        'teh,sil': record.get('tehsil', ''),
+                        'tehsil': record.get('tehsil', ''),
                         'uc': record.get('uc', ''),
                         'product': record.get('product', ''),
                         'longitude': longitude,

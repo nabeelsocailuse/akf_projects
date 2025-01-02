@@ -261,7 +261,6 @@ function loadFundsDashboard(frm) {
 			},
 			callback: function (r) {
 				const data = r.message;
-				console.log(data);
 				frm.dashboard.refresh();
 				
 				frm.dashboard.add_indicator(__('Total Allocation: {0}',
@@ -283,10 +282,6 @@ function loadFundsDashboard(frm) {
 				frm.dashboard.add_indicator(__('Remaining Amount: {0}',
 					[format_currency(data.remaining_amount)]),
 					'blue');
-				
-				frm.set_value("custom_budget_allocated", format_currency(data.total_allocation));
-				frm.set_value("custom_amount_spent", format_currency(data.total_purchase));
-				frm.set_value("custom_remaining_budget", format_currency(data.remaining_amount));
 			}
 		});
 	}

@@ -21,6 +21,15 @@ def get_transactions(filters=None):
     total_purchase = args['purchased_amount']
     # balance_amount = (total_allocation + received_funds -( transfered_funds + total_purchase ))
     balance_amount = (total_allocation -( transfered_funds + total_purchase ))
+    
+    filters.update({
+        "total_allocation": total_allocation,
+        "total_purchase": total_purchase,
+        "balance_amount": balance_amount,
+    })
+    
+    set_project_allocation(filters)
+    
     return{
         "total_allocation": total_allocation,
         "total_pledge": total_pledge,
@@ -29,6 +38,15 @@ def get_transactions(filters=None):
         "total_purchase": total_purchase,
         "remaining_amount": balance_amount
     }
+
+def set_project_allocation(filters):
+    frappe.db.sql(""" Update `tabProject` 
+                Set custom_total_allocation = %(total_allocation)s,
+                    custom_total_purchase = %(total_purchase)s,
+                    custom_remaining_allocation = %(balance_amount)s
+                Where
+                    name = %(project)s
+                """,filters )
 
 def get_donation(filters):
     def get_conditions():

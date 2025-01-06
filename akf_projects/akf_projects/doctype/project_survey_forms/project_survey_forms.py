@@ -73,6 +73,12 @@ def fetch_api_data():
                     
                     json_string = json.dumps(record, indent=None, separators=(',', ':'))
 
+                    def get_validation_status(record):
+                        validation_status = record.get('_validation_status')
+                        if isinstance(validation_status, dict):
+                            return validation_status.get('label')
+                        return None
+
                     # Prepare document data
                     doc_data = {
                         'form_id': form_id,
@@ -85,7 +91,7 @@ def fetch_api_data():
                         'end_time': convert_to_datetime(record.get('end')),
                         'version': record.get('_version'),
                         'status': record.get('_status'),
-                        'validation_status': record.get('_validation_status') if isinstance(record.get('_validation_status'), str) else None,
+                        'validation_status': get_validation_status(record),
                         'submitted_by': record.get('_submitted_by'),
                         'submission_time': convert_to_datetime(record.get('_submission_time')),
                         'region': record.get('region', ''),
@@ -95,7 +101,9 @@ def fetch_api_data():
                         'product': record.get('product', ''),
                         'longitude': longitude,
                         'latitude': latitude,
-                        'village': record.get('village', '')
+                        'village': record.get('village', ''),
+                        'service_area': record.get('service_area', ''),
+                        'sub_service_area': record.get('sub_service_area', '')
                     }
 
                     # Get or create document

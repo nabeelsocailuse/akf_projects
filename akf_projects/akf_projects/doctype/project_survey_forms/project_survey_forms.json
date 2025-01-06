@@ -18,6 +18,7 @@
   "tehsil",
   "village",
   "product",
+  "service_area",
   "latitude",
   "column_break_jkwrz",
   "end_time",
@@ -27,6 +28,7 @@
   "region",
   "uc",
   "allocation_status",
+  "sub_service_area",
   "longitude",
   "survey_form_json"
  ],
@@ -156,11 +158,23 @@
    "fieldname": "village",
    "fieldtype": "Data",
    "label": "Village"
+  },
+  {
+   "fieldname": "service_area",
+   "fieldtype": "Link",
+   "label": "Service Area",
+   "options": "Program"
+  },
+  {
+   "fieldname": "sub_service_area",
+   "fieldtype": "Link",
+   "label": "Sub Service Area",
+   "options": "Subservice Area"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2024-12-31 17:24:08.676049",
+ "modified": "2025-01-03 16:26:52.305647",
  "modified_by": "Administrator",
  "module": "AKF Projects",
  "name": "Project Survey Forms",

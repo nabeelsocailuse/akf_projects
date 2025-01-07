@@ -90,6 +90,9 @@ _highcharts_ = {
 };
 
 function region_wise_survey_(data) {
+	if (!data.data || data.data.length === 0) {
+        return '<div class="no-data-message">No data available</div>';
+    }
 	
     return `
     <script>
@@ -135,6 +138,9 @@ function region_wise_survey_(data) {
 }
 
 function district_wise_survey_(data) {
+	if (!data.data || data.data.length === 0) {
+        return '<div class="no-data-message">No data available</div>';
+    }
 	
     return `
     <script>
@@ -181,6 +187,9 @@ function district_wise_survey_(data) {
 
 
 function tehsil_wise_survey_(data) {
+	if (!data.data || data.data.length === 0) {
+        return '<div class="no-data-message">No data available</div>';
+    }
 	
     return `
     <script>
@@ -225,6 +234,9 @@ function tehsil_wise_survey_(data) {
 }
 
 function product_wise_survey_(data) {
+	if (!data.data || data.data.length === 0) {
+        return '<div class="no-data-message">No data available</div>';
+    }
 	
     return `
     <script>
@@ -269,6 +281,9 @@ function product_wise_survey_(data) {
 }
 
 function allocated_vs_unallocated_survey_(data) {
+	if (!data || (data.allocated === 0 && data.unallocated === 0)) {
+        return '<div class="no-data-message">No data available</div>';
+    }
 	
     return `
     <script>
@@ -318,6 +333,9 @@ function allocated_vs_unallocated_survey_(data) {
 }
 
 function approved_vs_unapproved_survey_(data) {
+	if (!data || (data.pending === 0 && data.verified === 0 && data.approved === 0)) {
+        return '<div class="no-data-message">No data available</div>';
+    }
 	
     return `
     <script>

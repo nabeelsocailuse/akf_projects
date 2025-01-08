@@ -111,8 +111,14 @@ class XProject(Project):
 		self.validate_from_to_dates("actual_start_date", "actual_end_date")
 		self.validate_payable() # Mubashir Bashir
 		self.update_survey_allocation() # Mubashir Bashir
+		self.update_project_allocation_check() # Mubarrim
 
-
+	def update_project_allocation_check(self): #Mubarrim 07-01-2025
+		if(self.custom_total_allocation > self.estimated_costing):
+			self.custom_allocation_check = 1			
+		else:
+			self.custom_allocation_check = 0
+						
 
 	def update_survey_allocation(self):  # Mubashir Bashir 3-12-24
 		# Fetch the previous value of custom_survey_id
@@ -1071,8 +1077,3 @@ def recalculate_project_total_purchase_cost(project: str | None = None):
 			"total_purchase_cost",
 			(total_purchase_cost and total_purchase_cost[0][0] or 0),
 		)
-
-
-
-
-    

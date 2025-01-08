@@ -114,8 +114,10 @@ class XProject(Project):
 		self.update_project_allocation_check() # Mubarrim
 
 	def update_project_allocation_check(self): #Mubarrim 07-01-2025
+		if not (self.custom_total_allocation and self.estimated_costing):
+			return 
 		if(self.custom_total_allocation > self.estimated_costing):
-			self.custom_allocation_check = 1			
+			self.custom_allocation_check = 1		
 		else:
 			self.custom_allocation_check = 0
 						

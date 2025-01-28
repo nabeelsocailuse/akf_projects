@@ -1,19 +1,18 @@
 {
  "actions": [],
  "allow_rename": 1,
+ "autoname": "format:{risk_title}-{####}",
  "creation": "2024-12-26 17:56:48.710636",
  "doctype": "DocType",
  "engine": "InnoDB",
  "field_order": [
-  "section_break_hksb",
+  "risk_title",
   "section_break_fcoa",
   "source",
   "category",
-  "status",
   "column_break_lzts",
   "risk_owner",
   "strategy",
-  "project_id",
   "section_break_mqzx",
   "description",
   "column_break_alpz",
@@ -21,20 +20,9 @@
   "column_break_yavc",
   "contigency_plan",
   "column_break_j7xa",
-  "remarks",
-  "section_break_pfwc",
-  "severity",
-  "column_break_5rvd",
-  "likelihood",
-  "column_break_fqa5",
-  "rating"
+  "remarks"
  ],
  "fields": [
-  {
-   "fieldname": "section_break_hksb",
-   "fieldtype": "Data",
-   "label": "Risk Description"
-  },
   {
    "fieldname": "source",
    "fieldtype": "Select",
@@ -45,13 +33,7 @@
    "fieldname": "category",
    "fieldtype": "Select",
    "label": "Category",
-   "options": "\nName of Process Areas\nTraining\nTools\nAdministration\nEmployee reluctance\nCommunication\nClient commitments"
-  },
-  {
-   "fieldname": "status",
-   "fieldtype": "Select",
-   "label": "Status",
-   "options": "\nNew\nOccurred\nClosed"
+   "options": "\nTraining\nTools\nAdministration\nEmployee reluctance\nCommunication\nClient commitments"
   },
   {
    "fieldname": "risk_owner",
@@ -64,12 +46,6 @@
    "fieldtype": "Select",
    "label": "Strategy",
    "options": "\nMitigate\nAccept\nTransfer\nAvoid"
-  },
-  {
-   "fieldname": "project_id",
-   "fieldtype": "Link",
-   "label": "Project ID",
-   "options": "Project"
   },
   {
    "fieldname": "description",
@@ -85,23 +61,6 @@
    "fieldname": "remarks",
    "fieldtype": "Small Text",
    "label": "Remarks"
-  },
-  {
-   "fieldname": "severity",
-   "fieldtype": "Select",
-   "label": "Severity",
-   "options": "\n1\n2\n3\n4\n5\n6\n7\n8\n9\n10"
-  },
-  {
-   "fieldname": "likelihood",
-   "fieldtype": "Select",
-   "label": "Likelihood",
-   "options": "\n1\n2\n3\n4\n5\n6\n7\n8\n9\n10"
-  },
-  {
-   "fieldname": "rating",
-   "fieldtype": "Data",
-   "label": "Rating"
   },
   {
    "fieldname": "column_break_lzts",
@@ -125,10 +84,6 @@
    "fieldtype": "Column Break"
   },
   {
-   "fieldname": "section_break_pfwc",
-   "fieldtype": "Section Break"
-  },
-  {
    "fieldname": "section_break_fcoa",
    "fieldtype": "Section Break"
   },
@@ -137,20 +92,20 @@
    "fieldtype": "Column Break"
   },
   {
-   "fieldname": "column_break_5rvd",
-   "fieldtype": "Column Break"
-  },
-  {
-   "fieldname": "column_break_fqa5",
-   "fieldtype": "Column Break"
+   "fieldname": "risk_title",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Risk Title",
+   "reqd": 1
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2024-12-26 18:33:54.540815",
+ "modified": "2025-01-13 15:18:37.308035",
  "modified_by": "Administrator",
  "module": "AKF Projects",
  "name": "Risk Register",
+ "naming_rule": "Expression",
  "owner": "Administrator",
  "permissions": [
   {

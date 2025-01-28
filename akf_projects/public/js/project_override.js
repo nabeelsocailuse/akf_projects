@@ -87,7 +87,19 @@ frappe.ui.form.on("Project", {
 
 		loadFundsDashboard(frm);
 		loadOpenStreetMap();
-		loadDonorsDashboard(frm)
+		loadDonorsDashboard(frm);
+		loadRisksConnection(frm); //  Mubashir Bashir 17-01-2025
+
+		//  Mubashir Bashir 17-01-2025 Start
+		// Set filter for task field in Risk Register Child table
+        frm.set_query("task", "custom_risk_register", function(doc, cdt, cdn) {
+            return {
+                filters: {
+                    "project": doc.name
+                }
+            };
+        });
+		//  Mubashir Bashir 17-01-2025 End
 	},
 
 	set_custom_buttons: function (frm) {
@@ -362,4 +374,105 @@ function loadDonorsDashboard(frm) {
 			frm.set_df_property("custom_donors_table", "options", _html_);
 		}
 	})
+}
+
+// Mubashir Bashir 17-01-2025 Start
+function loadRisksConnection(frm) {
+    if (frm.is_new()) return;
+
+	$('.custom-risks-section').remove();
+    
+    frappe.call({
+        method: 'akf_projects.customizations.overrides.project.project_override.get_project_risks',
+        args: {
+            project: frm.doc.name
+        },
+        callback: function(r) {
+            if (r.message && r.message.length) {
+                let risks_html = `
+                    <div class="form-dashboard-section custom-risks-section">
+                        <div class="section-head" data-toggle="collapse" data-target="#risks-section" 
+                            style="cursor: pointer;">
+                            Risks
+                            <span class="collapse-indicator mb-1">
+                                <i class="fa fa-chevron-up"></i>
+                            </span>
+                        </div>
+                        <div id="risks-section" class="collapse">
+                            <div class="row">`;
+                
+                r.message.forEach(risk => {
+                    let ratingClass = getRatingClass(risk.rating);
+                    risks_html += `
+                        <div class="col-sm-6 mb-2">
+                            <div style="background: var(--card-bg); border-radius: 8px; padding: 12px 15px; border: 1px solid var(--border-color);">
+                                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                                    <a href="/app/risk-register/${risk.risk}" class="text-primary" style="font-size: 14px; font-weight: 500;">
+                                        ${risk.risk}
+                                    </a>
+                                    <span class="indicator-pill ${ratingClass}" style="padding: 4px 8px;">
+                                        Rating: ${risk.rating}
+                                    </span>
+                                </div>
+                                <div style="display: flex; justify-content: space-between; color: var(--text-muted); font-size: 13px;">
+                                    <div>
+                                        <i class="fa fa-exclamation-triangle" style="color: var(--yellow-500); margin-right: 4px;"></i>
+                                        Severity: ${risk.severity}
+                                    </div>
+                                    <div>
+                                        <i class="fa fa-chart-line" style="color: var(--blue-500); margin-right: 4px;"></i>
+                                        Likelihood: ${risk.likelihood}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                });
+                
+                risks_html += `
+                            </div>
+                        </div>
+                    </div>`;
+                
+                $('.form-dashboard-section').last().after(risks_html);
+                
+                // Add click handler for collapse indicator
+                $('.custom-risks-section .section-head').on('click', function() {
+                    $(this).find('.collapse-indicator i').toggleClass('fa-chevron-up fa-chevron-down');
+                });
+            }
+        }
+    });
+}
+
+function getRatingClass(rating) {
+    rating = parseInt(rating) || 0;
+    if (rating >= 75) return 'red';
+    if (rating >= 50) return 'orange';
+    if (rating >= 25) return 'yellow';
+    return 'green';
+}
+
+// Mubashir Bashir 17-01-2025 End
+
+	// Mubashir Bashir 13/1/25 Start
+// Risk Register Child Table Triggers for rating
+
+frappe.ui.form.on('Risk Register Child', {
+    severity: function (frm, cdt, cdn) {
+        calculate_ratings(frm, cdt, cdn);
+    },
+    likelihood: function (frm, cdt, cdn) {
+        calculate_ratings(frm, cdt, cdn);
+    }
+});
+
+function calculate_ratings(frm, cdt, cdn) {
+    let child = locals[cdt][cdn];
+    if (child.severity && child.likelihood) {
+        let rating = child.severity * child.likelihood;
+        frappe.model.set_value(cdt, cdn, 'rating', rating);
+    } else {
+        frappe.model.set_value(cdt, cdn, 'rating', '');
+    }
 }

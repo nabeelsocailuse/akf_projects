@@ -1079,3 +1079,15 @@ def recalculate_project_total_purchase_cost(project: str | None = None):
 			"total_purchase_cost",
 			(total_purchase_cost and total_purchase_cost[0][0] or 0),
 		)
+
+# Mubashir Bashir 17-01-2025 Start
+@frappe.whitelist()
+def get_project_risks(project):
+    return frappe.get_all('Risk Register Child',
+        filters={
+            'parent': project,
+            'parenttype': 'Project'
+        },
+        fields=['risk', 'task', 'severity', 'likelihood', 'rating']
+    )
+# Mubashir Bashir 17-01-2025 End

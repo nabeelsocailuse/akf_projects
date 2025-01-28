@@ -3919,7 +3919,7 @@
    "hidden": 0,
    "idx": 0,
    "is_child_table": 0,
-   "link_doctype": "Stake Holders Matrix",
+   "link_doctype": "Stakeholders Matrix",
    "link_fieldname": "project_id",
    "modified": "2025-01-13 16:27:33.873646",
    "modified_by": "Administrator",

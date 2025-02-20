@@ -1,0 +1,721 @@
+{
+    "actions": [],
+    "allow_rename": 1,
+    "creation": "2025-02-18 18:28:08.845816",
+    "doctype": "DocType",
+    "engine": "InnoDB",
+    "field_order": [
+     "project_title",
+     "column_break_jwiy",
+     "project_code",
+     "project_description_section",
+     "project_type",
+     "region",
+     "areain_kanal",
+     "project_initial_budgetif_any",
+     "column_break_ggdv",
+     "brief_project_scope",
+     "district",
+     "land_transfer_to_akfp",
+     "project_approved_bymccccbm",
+     "column_break_shjr",
+     "city",
+     "building_name",
+     "estimated_project_budget",
+     "date1",
+     "project_location_section",
+     "region2",
+     "tehsil",
+     "latitude",
+     "column_break_zokp",
+     "district2",
+     "uc",
+     "longitude",
+     "requester_information_section",
+     "requested_by",
+     "column_break_vbnz",
+     "programdepartmentsubsidiary_manager",
+     "section_break_mimy",
+     "date2",
+     "column_break_vlfx",
+     "signature1",
+     "project_funding_section",
+     "project_funding_source_check_all_that_apply",
+     "section_break_bzcm",
+     "head_office",
+     "rmd",
+     "column_break_uwhd",
+     "regional_office",
+     "global",
+     "column_break_xsxp",
+     "requester_department",
+     "not_yet",
+     "project_sponsordonor_nameif_avaliable_section",
+     "funding",
+     "column_break_mydm",
+     "in_place",
+     "column_break_cihl",
+     "anticipated",
+     "column_break_aayl",
+     "unknown",
+     "projectdepartment_approvals_section",
+     "chairmanmddirectorname_and_title",
+     "section_break_xueu",
+     "date4",
+     "column_break_lrpj",
+     "sign2",
+     "additional_approving_authorityvpcabinet_if_required_section",
+     "date3",
+     "column_break_ovbw",
+     "sign3",
+     "check_listinternal_use_only_section",
+     "checkallparties",
+     "section_break_gffg",
+     "program_manager",
+     "column_break_hhpa",
+     "yes1",
+     "column_break_julz",
+     "no1",
+     "section_break_lhdi",
+     "cmccmb",
+     "column_break_ndtn",
+     "yes2",
+     "column_break_hocj",
+     "no2",
+     "section_break_yawa",
+     "managingdirector",
+     "column_break_ppwy",
+     "yes3",
+     "column_break_geln",
+     "no3",
+     "section_break_xiem",
+     "chairman1",
+     "column_break_dqcx",
+     "yes4",
+     "column_break_ankr",
+     "no4",
+     "section_break_faul",
+     "project__code",
+     "project_architetor",
+     "column_break_hrpe",
+     "received_amount",
+     "additional_comments",
+     "column_break_ilpd",
+     "project_supervisor",
+     "project_start_date",
+     "column_break_vahd",
+     "project_contractor",
+     "project_completion_date",
+     "seniormanager",
+     "column_break_uhsv",
+     "date6",
+     "column_break_dvve",
+     "sign4",
+     "departmentapprovingauthority",
+     "director",
+     "column_break_pznx",
+     "date7",
+     "column_break_zesl",
+     "sign5",
+     "chairman",
+     "date8",
+     "column_break_vpkj",
+     "sign6"
+    ],
+    "fields": [
+     {
+      "fieldname": "project_title",
+      "fieldtype": "Data",
+      "in_list_view": 1,
+      "label": "Project Title",
+      "reqd": 1
+     },
+     {
+      "fieldname": "column_break_jwiy",
+      "fieldtype": "Column Break"
+     },
+     {
+      "fieldname": "project_code",
+      "fieldtype": "Link",
+      "label": "Project Code ",
+      "options": "Project",
+      "read_only": 1
+     },
+     {
+      "fieldname": "project_description_section",
+      "fieldtype": "Section Break",
+      "label": "Project Description"
+     },
+     {
+      "fieldname": "project_type",
+      "fieldtype": "Data",
+      "label": "Project Type"
+     },
+     {
+      "fieldname": "region",
+      "fieldtype": "Data",
+      "label": "Region"
+     },
+     {
+      "fieldname": "areain_kanal",
+      "fieldtype": "Data",
+      "label": "Area(In kanal)"
+     },
+     {
+      "fieldname": "column_break_ggdv",
+      "fieldtype": "Column Break"
+     },
+     {
+      "fieldname": "brief_project_scope",
+      "fieldtype": "Data",
+      "label": "Brief Project Scope"
+     },
+     {
+      "fieldname": "district",
+      "fieldtype": "Data",
+      "label": "District"
+     },
+     {
+      "fieldname": "column_break_shjr",
+      "fieldtype": "Column Break"
+     },
+     {
+      "fieldname": "city",
+      "fieldtype": "Data",
+      "label": "City"
+     },
+     {
+      "fieldname": "building_name",
+      "fieldtype": "Data",
+      "label": "Building Name"
+     },
+     {
+      "fieldname": "project_initial_budgetif_any",
+      "fieldtype": "Data",
+      "label": "Project Initial Budget(If any)"
+     },
+     {
+      "fieldname": "land_transfer_to_akfp",
+      "fieldtype": "Data",
+      "label": "Land Transfer to AKFP"
+     },
+     {
+      "fieldname": "project_approved_bymccccbm",
+      "fieldtype": "Data",
+      "label": "Project Approved By/MC/CC/CBM"
+     },
+     {
+      "fieldname": "estimated_project_budget",
+      "fieldtype": "Data",
+      "label": "Estimated Project Budget"
+     },
+     {
+      "fieldname": "date1",
+      "fieldtype": "Date",
+      "label": "Date"
+     },
+     {
+      "fieldname": "requester_information_section",
+      "fieldtype": "Section Break",
+      "label": "Requester Information"
+     },
+     {
+      "fieldname": "requested_by",
+      "fieldtype": "Data",
+      "label": "Requested By"
+     },
+     {
+      "fieldname": "column_break_vbnz",
+      "fieldtype": "Column Break"
+     },
+     {
+      "fieldname": "programdepartmentsubsidiary_manager",
+      "fieldtype": "Data",
+      "label": "Program/Department/Subsidiary Manager"
+     },
+     {
+      "fieldname": "section_break_mimy",
+      "fieldtype": "Section Break"
+     },
+     {
+      "fieldname": "date2",
+      "fieldtype": "Date",
+      "label": "Date"
+     },
+     {
+      "fieldname": "column_break_vlfx",
+      "fieldtype": "Column Break"
+     },
+     {
+      "fieldname": "project_funding_section",
+      "fieldtype": "Section Break",
+      "label": "Project Funding"
+     },
+     {
+      "fieldname": "project_funding_source_check_all_that_apply",
+      "fieldtype": "Heading",
+      "label": "Project funding Source (check All That Apply)"
+     },
+     {
+      "fieldname": "section_break_bzcm",
+      "fieldtype": "Section Break"
+     },
+     {
+      "default": "0",
+      "fieldname": "head_office",
+      "fieldtype": "Check",
+      "label": "Head Office"
+     },
+     {
+      "default": "0",
+      "fieldname": "rmd",
+      "fieldtype": "Check",
+      "label": "RMD"
+     },
+     {
+      "fieldname": "column_break_uwhd",
+      "fieldtype": "Column Break"
+     },
+     {
+      "default": "0",
+      "fieldname": "regional_office",
+      "fieldtype": "Check",
+      "label": "Regional Office"
+     },
+     {
+      "default": "0",
+      "fieldname": "global",
+      "fieldtype": "Check",
+      "label": "Global"
+     },
+     {
+      "fieldname": "column_break_xsxp",
+      "fieldtype": "Column Break"
+     },
+     {
+      "default": "0",
+      "fieldname": "requester_department",
+      "fieldtype": "Check",
+      "label": "Requester Department"
+     },
+     {
+      "default": "0",
+      "fieldname": "not_yet",
+      "fieldtype": "Check",
+      "label": "Not Yet"
+     },
+     {
+      "fieldname": "signature1",
+      "fieldtype": "Signature",
+      "label": "Signature"
+     },
+     {
+      "fieldname": "project_sponsordonor_nameif_avaliable_section",
+      "fieldtype": "Section Break",
+      "label": "Project Sponsor/Donor Name(if avaliable)"
+     },
+     {
+      "fieldname": "funding",
+      "fieldtype": "Heading",
+      "label": "Funding"
+     },
+     {
+      "fieldname": "column_break_mydm",
+      "fieldtype": "Column Break"
+     },
+     {
+      "default": "0",
+      "fieldname": "in_place",
+      "fieldtype": "Check",
+      "label": "In Place"
+     },
+     {
+      "fieldname": "column_break_cihl",
+      "fieldtype": "Column Break"
+     },
+     {
+      "default": "0",
+      "fieldname": "anticipated",
+      "fieldtype": "Check",
+      "label": "Anticipated"
+     },
+     {
+      "fieldname": "column_break_aayl",
+      "fieldtype": "Column Break"
+     },
+     {
+      "default": "0",
+      "fieldname": "unknown",
+      "fieldtype": "Check",
+      "label": "Unknown"
+     },
+     {
+      "fieldname": "projectdepartment_approvals_section",
+      "fieldtype": "Section Break",
+      "label": "Project/Department Approvals"
+     },
+     {
+      "fieldname": "chairmanmddirectorname_and_title",
+      "fieldtype": "Data",
+      "label": "Chairman/MD/Director(Name and Title)"
+     },
+     {
+      "fieldname": "section_break_xueu",
+      "fieldtype": "Section Break"
+     },
+     {
+      "fieldname": "date4",
+      "fieldtype": "Data",
+      "label": "Date"
+     },
+     {
+      "fieldname": "column_break_lrpj",
+      "fieldtype": "Column Break"
+     },
+     {
+      "fieldname": "sign2",
+      "fieldtype": "Signature",
+      "label": "Signature"
+     },
+     {
+      "fieldname": "additional_approving_authorityvpcabinet_if_required_section",
+      "fieldtype": "Section Break",
+      "label": "Additional Approving Authority(VP/Cabinet) if required"
+     },
+     {
+      "fieldname": "date3",
+      "fieldtype": "Date",
+      "label": "Date"
+     },
+     {
+      "fieldname": "column_break_ovbw",
+      "fieldtype": "Column Break"
+     },
+     {
+      "fieldname": "sign3",
+      "fieldtype": "Signature",
+      "label": "Signature"
+     },
+     {
+      "fieldname": "check_listinternal_use_only_section",
+      "fieldtype": "Section Break",
+      "label": "Check List(Internal Use Only)"
+     },
+     {
+      "fieldname": "checkallparties",
+      "fieldtype": "Heading",
+      "label": "Check All Parties That Need To Approve the project    (Has The Approval Been Granted?)"
+     },
+     {
+      "fieldname": "section_break_gffg",
+      "fieldtype": "Section Break"
+     },
+     {
+      "fieldname": "program_manager",
+      "fieldtype": "Data",
+      "label": "Program Manager"
+     },
+     {
+      "fieldname": "column_break_hhpa",
+      "fieldtype": "Column Break"
+     },
+     {
+      "default": "0",
+      "fieldname": "yes1",
+      "fieldtype": "Check",
+      "label": "Yes"
+     },
+     {
+      "fieldname": "column_break_julz",
+      "fieldtype": "Column Break"
+     },
+     {
+      "default": "0",
+      "fieldname": "no1",
+      "fieldtype": "Check",
+      "label": "No"
+     },
+     {
+      "fieldname": "section_break_lhdi",
+      "fieldtype": "Section Break"
+     },
+     {
+      "fieldname": "cmccmb",
+      "fieldtype": "Data",
+      "label": "(CMC/CMB)"
+     },
+     {
+      "fieldname": "column_break_ndtn",
+      "fieldtype": "Column Break"
+     },
+     {
+      "fieldname": "column_break_hocj",
+      "fieldtype": "Column Break"
+     },
+     {
+      "default": "0",
+      "fieldname": "yes2",
+      "fieldtype": "Check",
+      "label": "Yes"
+     },
+     {
+      "default": "0",
+      "fieldname": "no2",
+      "fieldtype": "Check",
+      "label": "No"
+     },
+     {
+      "fieldname": "section_break_yawa",
+      "fieldtype": "Section Break"
+     },
+     {
+      "fieldname": "managingdirector",
+      "fieldtype": "Data",
+      "label": "Managing Director P&D"
+     },
+     {
+      "fieldname": "column_break_ppwy",
+      "fieldtype": "Column Break"
+     },
+     {
+      "default": "0",
+      "fieldname": "yes3",
+      "fieldtype": "Check",
+      "label": "Yes"
+     },
+     {
+      "fieldname": "column_break_geln",
+      "fieldtype": "Column Break"
+     },
+     {
+      "default": "0",
+      "fieldname": "no3",
+      "fieldtype": "Check",
+      "label": "No"
+     },
+     {
+      "fieldname": "section_break_xiem",
+      "fieldtype": "Section Break"
+     },
+     {
+      "fieldname": "chairman1",
+      "fieldtype": "Data",
+      "label": "Chairman P&D"
+     },
+     {
+      "fieldname": "column_break_dqcx",
+      "fieldtype": "Column Break"
+     },
+     {
+      "default": "0",
+      "fieldname": "yes4",
+      "fieldtype": "Check",
+      "label": "Yes"
+     },
+     {
+      "fieldname": "column_break_ankr",
+      "fieldtype": "Column Break"
+     },
+     {
+      "default": "0",
+      "fieldname": "no4",
+      "fieldtype": "Check",
+      "label": "No"
+     },
+     {
+      "fieldname": "section_break_faul",
+      "fieldtype": "Section Break"
+     },
+     {
+      "fieldname": "project__code",
+      "fieldtype": "Data",
+      "label": "Project  Code"
+     },
+     {
+      "fieldname": "project_architetor",
+      "fieldtype": "Data",
+      "label": "Project Architetor"
+     },
+     {
+      "fieldname": "column_break_hrpe",
+      "fieldtype": "Column Break"
+     },
+     {
+      "fieldname": "received_amount",
+      "fieldtype": "Currency",
+      "label": "Received Amount"
+     },
+     {
+      "fieldname": "additional_comments",
+      "fieldtype": "Data",
+      "label": "Additional Comments"
+     },
+     {
+      "fieldname": "column_break_ilpd",
+      "fieldtype": "Column Break"
+     },
+     {
+      "fieldname": "project_supervisor",
+      "fieldtype": "Data",
+      "label": "Project Supervisor"
+     },
+     {
+      "fieldname": "project_start_date",
+      "fieldtype": "Date",
+      "label": "Project Start Date"
+     },
+     {
+      "fieldname": "column_break_vahd",
+      "fieldtype": "Column Break"
+     },
+     {
+      "fieldname": "project_contractor",
+      "fieldtype": "Data",
+      "label": "Project Contractor"
+     },
+     {
+      "fieldname": "project_completion_date",
+      "fieldtype": "Date",
+      "label": "Project Completion Date"
+     },
+     {
+      "fieldname": "seniormanager",
+      "fieldtype": "Section Break",
+      "label": "P&D Senior Manager"
+     },
+     {
+      "fieldname": "sign4",
+      "fieldtype": "Signature",
+      "label": "Signature"
+     },
+     {
+      "fieldname": "column_break_uhsv",
+      "fieldtype": "Column Break"
+     },
+     {
+      "fieldname": "date6",
+      "fieldtype": "Date",
+      "label": "Date"
+     },
+     {
+      "fieldname": "departmentapprovingauthority",
+      "fieldtype": "Section Break",
+      "label": "P&D Department Approving Authority(Internal Use Only)"
+     },
+     {
+      "fieldname": "director",
+      "fieldtype": "Heading",
+      "label": "Director P&D"
+     },
+     {
+      "fieldname": "column_break_pznx",
+      "fieldtype": "Column Break"
+     },
+     {
+      "fieldname": "date7",
+      "fieldtype": "Date",
+      "label": "Date"
+     },
+     {
+      "fieldname": "column_break_zesl",
+      "fieldtype": "Column Break"
+     },
+     {
+      "fieldname": "sign5",
+      "fieldtype": "Signature",
+      "label": "Signature"
+     },
+     {
+      "fieldname": "chairman",
+      "fieldtype": "Section Break",
+      "label": "Chairman P&D"
+     },
+     {
+      "fieldname": "date8",
+      "fieldtype": "Date",
+      "label": "Date"
+     },
+     {
+      "fieldname": "column_break_vpkj",
+      "fieldtype": "Column Break"
+     },
+     {
+      "fieldname": "sign6",
+      "fieldtype": "Signature",
+      "label": "Signature"
+     },
+     {
+      "fieldname": "column_break_dvve",
+      "fieldtype": "Column Break"
+     },
+     {
+      "fieldname": "project_location_section",
+      "fieldtype": "Section Break",
+      "label": "Project Location"
+     },
+     {
+      "fieldname": "region2",
+      "fieldtype": "Data",
+      "label": "Region",
+      "reqd": 1
+     },
+     {
+      "fieldname": "tehsil",
+      "fieldtype": "Data",
+      "label": "Tehsil",
+      "reqd": 1
+     },
+     {
+      "fieldname": "latitude",
+      "fieldtype": "Data",
+      "label": "Latitude",
+      "reqd": 1
+     },
+     {
+      "fieldname": "column_break_zokp",
+      "fieldtype": "Column Break"
+     },
+     {
+      "fieldname": "district2",
+      "fieldtype": "Data",
+      "label": "District",
+      "reqd": 1
+     },
+     {
+      "fieldname": "uc",
+      "fieldtype": "Data",
+      "label": "UC",
+      "reqd": 1
+     },
+     {
+      "fieldname": "longitude",
+      "fieldtype": "Data",
+      "label": "Longitude",
+      "reqd": 1
+     }
+    ],
+    "index_web_pages_for_search": 1,
+    "links": [],
+    "modified": "2025-02-19 18:36:05.287276",
+    "modified_by": "Administrator",
+    "module": "Akf Projects",
+    "name": "Project Approval Form",
+    "owner": "Administrator",
+    "permissions": [
+     {
+      "create": 1,
+      "delete": 1,
+      "email": 1,
+      "export": 1,
+      "print": 1,
+      "read": 1,
+      "report": 1,
+      "role": "System Manager",
+      "share": 1,
+      "write": 1
+     }
+    ],
+    "sort_field": "modified",
+    "sort_order": "DESC",
+    "states": []
+   }

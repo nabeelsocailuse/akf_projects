@@ -438,7 +438,7 @@ class XProject(Project):
 
 	# Mubashir Bashir
 	def validate_payable(self):
-		if(self.custom_financial_close == 'Close'):
+		if(self.custom_financial_close == 'Hard'):
 			payable_balance = self.get_project_payable_balance()['balance']
 			if(payable_balance > 0):
 				frappe.throw(_(f'Cannot complete the project because the payable account balance Rs {payable_balance} is pending.'))

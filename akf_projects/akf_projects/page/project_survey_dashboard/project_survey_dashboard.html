@@ -23,6 +23,22 @@
         color: #333333;
         font-weight: 600;
     }
+    .loading-spinner {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 200px;
+    }
+
+    .spinner {
+        width: 50px;
+        height: 50px;
+        border: 5px solid #f3f3f3;
+        border-radius: 50%;
+        border-top: 5px solid #3498db;
+        animation: spin 1s linear infinite;
+    }
+
     .no-data-message {
         display: flex;
         justify-content: center;
@@ -32,6 +48,10 @@
         font-size: 16px;
     }
 
+    @keyframes spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+    }
 </style>
 <body>
     <div class="row g-4">
@@ -47,32 +67,56 @@
         </div>        
         <div class="col-md-6">
             <div class="context_box">
-                <div id="district_wise_survey"></div>
+                <div id="district_wise_survey">
+                    <div class="loading-spinner">
+                        <div class="spinner"></div>
+                    </div>
+                </div>
             </div>
         </div>
         <div class="col-md-6">
             <div class="context_box">
-                <div id="region_wise_survey"></div>
+                <div id="region_wise_survey">
+                    <div class="loading-spinner">
+                        <div class="spinner"></div>
+                    </div>
+                </div>
             </div>
         </div>
         <div class="col-md-6">
             <div class="context_box">
-                <div id="tehsil_wise_survey"></div>
+                <div id="tehsil_wise_survey">
+                    <div class="loading-spinner">
+                        <div class="spinner"></div>
+                    </div>
+                </div>
             </div>
         </div>
         <div class="col-md-6">
             <div class="context_box">
-                <div id="product_wise_survey"></div>
+                <div id="product_wise_survey">
+                    <div class="loading-spinner">
+                        <div class="spinner"></div>
+                    </div>
+                </div>
             </div>
         </div>
         <div class="col-md-6">
             <div class="context_box">
-                <div id="allocated_vs_unallocated_survey"></div>
+                <div id="allocated_vs_unallocated_survey">
+                    <div class="loading-spinner">
+                        <div class="spinner"></div>
+                    </div>
+                </div>
             </div>
         </div>
         <div class="col-md-6">
             <div class="context_box">
-                <div id="approved_vs_unapproved_survey"></div>
+                <div id="approved_vs_unapproved_survey">
+                    <div class="loading-spinner">
+                        <div class="spinner"></div>
+                    </div>
+                </div>
             </div>
         </div>
     </div>

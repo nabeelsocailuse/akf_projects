@@ -40,6 +40,12 @@ server_call = {
                 // console.log(r.message);
 
             },
+			error: function(r) {
+                // In case of error, show error message instead of charts
+                $('.context_box div[id]').each(function() {
+                    $(this).html('<div class="no-data-message">Error loading data</div>');
+                });
+            }
         });
     },
 	
@@ -47,14 +53,21 @@ server_call = {
 
 
 
+
 _highcharts_ = {
     load_charts: function (info) {      
-      _highcharts_.region_wise_survey(info.region_wise_survey);     
-      _highcharts_.district_wise_survey(info.district_wise_survey);     
-      _highcharts_.tehsil_wise_survey(info.tehsil_wise_survey);     
-      _highcharts_.product_wise_survey(info.product_wise_survey);     
-      _highcharts_.allocated_vs_unallocated_survey(info.allocated_vs_unallocated_survey);     
-      _highcharts_.approved_vs_unapproved_survey(info.approved_vs_unapproved_survey);     
+    //   _highcharts_.region_wise_survey(info.region_wise_survey);     
+    //   _highcharts_.district_wise_survey(info.district_wise_survey);     
+    //   _highcharts_.tehsil_wise_survey(info.tehsil_wise_survey);     
+    //   _highcharts_.product_wise_survey(info.product_wise_survey);     
+    //   _highcharts_.allocated_vs_unallocated_survey(info.allocated_vs_unallocated_survey);     
+    //   _highcharts_.approved_vs_unapproved_survey(info.approved_vs_unapproved_survey); 
+		setTimeout(() => this.region_wise_survey(info.region_wise_survey), 0);
+		setTimeout(() => this.district_wise_survey(info.district_wise_survey), 100);
+		setTimeout(() => this.tehsil_wise_survey(info.tehsil_wise_survey), 200);
+		setTimeout(() => this.product_wise_survey(info.product_wise_survey), 300);
+		setTimeout(() => this.allocated_vs_unallocated_survey(info.allocated_vs_unallocated_survey), 400);
+		setTimeout(() => this.approved_vs_unapproved_survey(info.approved_vs_unapproved_survey), 500);    
     },
 
     region_wise_survey: function (data) {

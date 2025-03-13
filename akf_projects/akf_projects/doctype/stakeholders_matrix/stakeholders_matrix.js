@@ -84,7 +84,7 @@ function populate_internal_stakeholders(frm) {
 
         // Wait for all task fetching operations to complete
         Promise.all(promises).then(() => {
-            frm.refresh_field('internal_stakeholder');
+            // frm.refresh_field('internal_stakeholder');
             frm.save();
         });
     }).catch(err => {

@@ -9,6 +9,7 @@ frappe.ui.form.on("Project Approval Form", {
                     args: {
                         doc: {
                             doctype: "Project",
+                            project_template: frm.doc.project_template,
                             project_name: frm.doc.project_title,
                             custom_region: frm.doc.region2,
                             custom_district: frm.doc.district2,

@@ -1,10 +1,9 @@
-// Copyright (c) 2025, Mubarrim Iqbal and contributors
-// For license information, please see license.txt
+// Mubashir Bashir 19-04-2025
 
 frappe.ui.form.on("Project Approval Form", {
     refresh: function(frm) {
-        if (!frm.is_new()) {
-            frm.add_custom_button("Create Project", function() {
+        if (!frm.is_new() && frm.doc.docstatus == 1 && !frm.doc.project_code) {
+            let btn = frm.add_custom_button("Create Project", function() {
                 frappe.call({
                     method: "frappe.client.insert",
                     args: {
@@ -16,12 +15,14 @@ frappe.ui.form.on("Project Approval Form", {
                             custom_tehsil: frm.doc.tehsil,
                             custom_uc: frm.doc.uc,
                             custom_latitude: frm.doc.latitude,
-                            custom_longitude: frm.doc.longitude
+                            custom_longitude: frm.doc.longitude,
+                            custom_service_area: frm.doc.service_area,
+                            estimated_costing: frm.doc.estimated_project_budget
                         }
                     },
                     callback: function(response) {
                         if (response && response.message) {
-                            let project_id = response.message.name; 
+                            let project_id = response.message.name;
 
                             frm.set_value("project_code", project_id);
                             frm.save().then(() => {
@@ -30,11 +31,16 @@ frappe.ui.form.on("Project Approval Form", {
                                     indicator: 'green',
                                     message: __('Project Created: {0}', [project_id])
                                 });
-                            }); 
+
+                                // Remove the button after successful creation
+                                frm.page.clear_custom_actions();
+                            });
                         }
                     }
                 });
-            }).addClass("btn-primary");
+            });
+
+            btn.addClass("btn-primary");
         }
     }
 });

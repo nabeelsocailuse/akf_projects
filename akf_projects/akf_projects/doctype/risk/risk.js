@@ -1,6 +1,6 @@
 // Developer Mubashir Bashir
 
-// frappe.ui.form.on("Risk Register", {
+// frappe.ui.form.on("Risk", {
 // 	// refresh(frm) {
 
 // 	// },

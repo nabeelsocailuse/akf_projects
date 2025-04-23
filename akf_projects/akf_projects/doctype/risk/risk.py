@@ -5,5 +5,5 @@
 from frappe.model.document import Document
 
 
-class RiskRegister(Document):
+class Risk(Document):
 	pass

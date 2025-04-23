@@ -5,5 +5,5 @@
 from frappe.tests.utils import FrappeTestCase
 
 
-class TestRiskRegister(FrappeTestCase):
+class TestRisk(FrappeTestCase):
 	pass

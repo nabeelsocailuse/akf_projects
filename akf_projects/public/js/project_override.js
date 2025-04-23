@@ -21,7 +21,7 @@ frappe.ui.form.on("Project", {
 		// loadFundsDashboard(frm);
 	},
 	onload: function (frm) {
-		console.log("project override onload");
+		setTimeout(() => toggle_risk_buttons(frm), 100); // Mubashir Bashir 22-04-2025
 
 		const so = frm.get_docfield("sales_order");
 		so.get_route_options_for_new_doc = () => {
@@ -74,8 +74,6 @@ frappe.ui.form.on("Project", {
 
 	refresh: function (frm) {
 
-		console.log("project override refresh");
-
 		if (frm.doc.__islocal) {
 			frm.web_link && frm.web_link.remove();
 		} else {
@@ -89,16 +87,17 @@ frappe.ui.form.on("Project", {
 		loadOpenStreetMap();
 		loadDonorsDashboard(frm);
 		loadRisksConnection(frm); //  Mubashir Bashir 17-01-2025
+		setTimeout(() => toggle_risk_buttons(frm), 100); // Mubashir Bashir 22-04-2025
 
 		//  Mubashir Bashir 17-01-2025 Start
 		// Set filter for task field in Risk Register Child table
-        frm.set_query("task", "custom_risk_register", function(doc, cdt, cdn) {
-            return {
-                filters: {
-                    "project": doc.name
-                }
-            };
-        });
+        // frm.set_query("task", "custom_risk_register", function(doc, cdt, cdn) {
+        //     return {
+        //         filters: {
+        //             "project": doc.name
+        //         }
+        //     };
+        // });
 		//  Mubashir Bashir 17-01-2025 End
 	},
 
@@ -452,9 +451,25 @@ function getRatingClass(rating) {
     if (rating >= 25) return 'yellow';
     return 'green';
 }
-
 // Mubashir Bashir 17-01-2025 End
+function toggle_risk_buttons(frm) {
+    const is_new = frm.is_new();
 
+    const risk_table = frm.fields_dict['custom_risk_register'];
+    if (risk_table && risk_table.grid) {
+
+        const addBtn = risk_table.grid.fields_map['add_tasks'];
+        const viewBtn = risk_table.grid.fields_map['view_tasks'];
+
+        if (addBtn) addBtn.hidden = is_new;
+        else console.warn('add_tasks button not found in child table');
+
+        if (viewBtn) viewBtn.hidden = is_new;
+        else console.warn('view_tasks button not found in child table');
+
+        risk_table.refresh();
+    }
+}
 	// Mubashir Bashir 13/1/25 Start
 // Risk Register Child Table Triggers for rating
 
@@ -464,7 +479,13 @@ frappe.ui.form.on('Risk Register Child', {
     },
     likelihood: function (frm, cdt, cdn) {
         calculate_ratings(frm, cdt, cdn);
-    }
+    },
+	add_tasks: function (frm, cdt, cdn) {
+		redirect_to_task(frm, cdt, cdn);
+	},
+	view_tasks: function (frm, cdt, cdn) {
+		redirect_to_task_list(frm, cdt, cdn);
+	}
 });
 
 function calculate_ratings(frm, cdt, cdn) {
@@ -475,4 +496,32 @@ function calculate_ratings(frm, cdt, cdn) {
     } else {
         frappe.model.set_value(cdt, cdn, 'rating', '');
     }
+}
+
+function redirect_to_task(frm, cdt, cdn) {
+    let child = locals[cdt][cdn];
+
+    if (!child.risk) {
+        frappe.msgprint(__('Please fill in the Risk field before adding a task.'));
+        return;
+    }
+
+    frappe.new_doc('Task', {
+        project: frm.doc.name,
+        custom_risk_id: child.risk
+    });
+}
+
+function redirect_to_task_list(frm, cdt, cdn) {
+	let child = locals[cdt][cdn];
+
+	if (!child.risk) {
+        frappe.msgprint(__('Please fill in the Risk field before adding a task.'));
+        return;
+    }
+
+	frappe.set_route('List', 'Task', {
+        project: frm.doc.name,
+        custom_risk_id: child.risk
+    });
 }

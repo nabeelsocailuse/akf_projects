@@ -31,6 +31,7 @@ app_license = "mit"
 # doctype_js = {"doctype" : "public/js/doctype.js"}
 doctype_js = {
     "Project" : "public/js/project_override.js",
+    "Task" : "public/js/task_override.js",
     }
 
 

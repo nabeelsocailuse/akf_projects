@@ -78,55 +78,32 @@ class XTask(Task):
                             message = message
                         )
 
-# @frappe.whitelist()
-# def create_duplicate_tasks(prev_doc, subject):
-# 	import json
+    def on_trash(self):      #Mubashir Bashir
 
-# 	prev_doc = json.loads(prev_doc)
-# 	parent_name = prev_doc.get("name")
+        self.remove_from_all_parent_dependencies()
 
-# 	# Duplicate parent task
-# 	new_parent = frappe.new_doc("Task")
-# 	new_parent.subject = subject
-# 	new_parent.project = prev_doc.get("project")
-# 	new_parent.is_group = 1
-# 	new_parent.status = "Open"
-# 	new_parent.description = prev_doc.get("description")
-# 	new_parent.exp_start_date = prev_doc.get("exp_start_date")
-# 	new_parent.exp_end_date = prev_doc.get("exp_end_date")
-# 	new_parent.priority = prev_doc.get("priority")
-# 	new_parent.custom_risk_id = prev_doc.get("custom_risk_id")
+        if self.is_group:
+            self.delete_all_child_tasks()
 
-# 	# Save to get the new parent name
-# 	new_parent.insert()
+    def remove_from_all_parent_dependencies(self):
+        parent_tasks = frappe.get_all("Task Depends On", filters={"task": self.name}, fields=["parent"])
+        for record in parent_tasks:
+            parent_doc = frappe.get_doc("Task", record.parent)
+            parent_doc.depends_on = [d for d in parent_doc.depends_on if d.task != self.name]
+            parent_doc.save()
 
-# 	# Fetch child tasks
-# 	child_tasks = frappe.get_all("Task", filters={"parent_task": parent_name}, fields=["*"])
+    def delete_all_child_tasks(self):
+        child_tasks = frappe.get_all("Task", filters={"parent_task": self.name}, pluck="name")
+        for child in child_tasks:
+            frappe.delete_doc("Task", child, force=True)                     
 
-# 	for child in child_tasks:
-# 		new_child = frappe.new_doc("Task")
-# 		new_child.subject = child.subject
-# 		new_child.project = child.project
-# 		new_child.status = "Open"
-# 		new_child.description = child.description
-# 		new_child.exp_start_date = child.exp_start_date
-# 		new_child.exp_end_date = child.exp_end_date
-# 		new_child.priority = child.priority
-# 		new_child.parent_task = new_parent.name
-# 		new_child.custom_risk_id = new_parent.custom_risk_id
-
-# 		new_child.insert()
-
-# 	frappe.db.commit()
-# 	return new_parent.name
-
-@frappe.whitelist()
+@frappe.whitelist()                                  #Mubashir Bashir
 def create_duplicate_tasks(prev_doc, subject):
 	import json
 	prev_doc = json.loads(prev_doc)
 	parent_name = prev_doc.get("name")
 
-	# Create the new parent task
+	# Creating the new parent task
 	new_parent = frappe.new_doc("Task")
 	new_parent.subject = subject
 	new_parent.project = prev_doc.get("project")
@@ -166,3 +143,7 @@ def duplicate_child_tasks(old_parent_name, new_parent_name):
 		# Recursively duplicate this child’s children
 		if child.is_group:
 			duplicate_child_tasks(child.name, new_child.name)
+
+
+
+

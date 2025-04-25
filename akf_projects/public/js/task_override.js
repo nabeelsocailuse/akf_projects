@@ -60,11 +60,11 @@ frappe.ui.form.on("Task", {
 			frm.doc.project);
 	},
 
-	refresh: function (frm) {
+	refresh: function (frm) {	// Mubbashir
 		frm.trigger("set_custom_buttons");
     },
 
-    set_custom_buttons: function (frm) {
+    set_custom_buttons: function (frm) {	// Mubbashir
         if (!frm.is_new() && frm.doc.is_group) {
             frm.add_custom_button(__('Duplicate Task with Childs'), () => {
                 frm.events.create_duplicate(frm);
@@ -72,7 +72,7 @@ frappe.ui.form.on("Task", {
         }
     },
 
-    create_duplicate: function (frm) {
+    create_duplicate: function (frm) {	// Mubbashir
 		return new Promise(resolve => {
 			frappe.prompt('Subject', (data) => {
 				frappe.xcall('akf_projects.customizations.overrides.project.task_override.create_duplicate_tasks',

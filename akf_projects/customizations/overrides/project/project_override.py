@@ -841,34 +841,57 @@ def allow_to_make_project_update(project, time, frequency):
 		return True
 
 
-@frappe.whitelist()
+@frappe.whitelist()		# Mubashir
 def create_duplicate_project(prev_doc, project_name):
-	"""Create duplicate project based on the old project"""
 	import json
-
 	prev_doc = json.loads(prev_doc)
 
 	if project_name == prev_doc.get("name"):
-		frappe.throw(_("Use a name that is different from previous project name"))
+		frappe.throw(_("Use a name that is different from the previous project name"))
 
-	# change the copied doc name to new project name
-	project = frappe.copy_doc(prev_doc)
-	project.name = project_name
-	project.project_template = ""
-	project.project_name = project_name
-	project.insert()
+	# Duplicate the project
+	new_project = frappe.copy_doc(prev_doc)
+	new_project.name = project_name
+	new_project.project_template = ""
+	new_project.project_name = project_name
+	new_project.insert()
 
-	# fetch all the task linked with the old project
-	task_list = frappe.get_all("Task", filters={"project": prev_doc.get("name")}, fields=["name"])
+	old_tasks = frappe.get_all("Task", filters={"project": prev_doc.get("name")}, fields=["*"])
 
-	# Create duplicate task for all the task
-	for task in task_list:
-		task = frappe.get_doc("Task", task)
-		new_task = frappe.copy_doc(task)
-		new_task.project = project.name
+	# Step 1: Create all new tasks WITHOUT parent_task set yet
+	old_to_new_map = {}  # old_task_name -> new_task_doc
+
+	for old_task in old_tasks:
+		new_task = frappe.new_doc("Task")
+		new_task.subject = old_task.subject
+		new_task.project = new_project.name
+		new_task.status = "Open"
+		new_task.description = old_task.description
+		new_task.exp_start_date = old_task.exp_start_date
+		new_task.exp_end_date = old_task.exp_end_date
+		new_task.priority = old_task.priority
+		new_task.is_group = old_task.is_group
+		new_task.custom_risk_id = old_task.custom_risk_id
 		new_task.insert()
 
-	project.db_set("project_template", prev_doc.get("project_template"))
+		old_to_new_map[old_task.name] = new_task.name
+
+	# Step 2: Now set correct parent_task using the map
+	for old_task in old_tasks:
+		if old_task.parent_task:
+			old_child_name = old_task.name
+			old_parent_name = old_task.parent_task
+
+			new_child_name = old_to_new_map[old_child_name]
+			new_parent_name = old_to_new_map.get(old_parent_name)
+
+			if new_parent_name:
+				frappe.db.set_value("Task", new_child_name, "parent_task", new_parent_name)
+
+	frappe.db.commit()
+	return new_project.name
+
+
 
 
 def get_projects_for_collect_progress(frequency, fields):

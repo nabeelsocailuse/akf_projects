@@ -216,22 +216,21 @@ frappe.ui.form.on("Project", {
 		}, __("Actions"));
 	},
 
-	create_duplicate: function (frm) {
+	create_duplicate: function (frm) {	// Mubashir
 		return new Promise(resolve => {
-			frappe.prompt('Project Name', (data) => {
-				frappe.xcall('erpnext.projects.doctype.project.project.create_duplicate_project',
-					{
-						prev_doc: frm.doc,
-						project_name: data.value
-					}).then(() => {
-						frappe.set_route('Form', "Project", data.value);
-						frappe.show_alert(__("Duplicate project has been created"));
-					});
+			frappe.prompt('New Project Name', (data) => {
+				frappe.xcall('akf_projects.customizations.overrides.project.project_override.create_duplicate_project', {
+					prev_doc: frm.doc,
+					project_name: data.value
+				}).then((new_project_name) => {
+					frappe.set_route('Form', "Project", new_project_name);
+					frappe.show_alert(__("Duplicate project has been created"));
+				});
 				resolve();
 			});
 		});
 	},
-
+	
 	set_status: function (frm, status) {
 		frappe.confirm(__('Set Project and all Tasks to status {0}?', [status.bold()]), () => {
 			frappe.xcall('erpnext.projects.doctype.project.project.set_project_status',

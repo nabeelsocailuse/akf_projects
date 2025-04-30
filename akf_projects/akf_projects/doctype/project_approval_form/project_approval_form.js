@@ -19,7 +19,8 @@ frappe.ui.form.on("Project Approval Form", {
                             custom_latitude: frm.doc.latitude,
                             custom_longitude: frm.doc.longitude,
                             custom_service_area: frm.doc.service_area,
-                            estimated_costing: frm.doc.estimated_project_budget
+                            estimated_costing: frm.doc.estimated_project_budget,
+                            expected_start_date: frm.doc.expected_start_date
                         }
                     },
                     callback: function(response) {

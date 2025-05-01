@@ -461,7 +461,7 @@
  "index_web_pages_for_search": 1,
  "links": [],
  "max_attachments": 4,
- "modified": "2025-05-01 12:07:44.325218",
+ "modified": "2025-05-01 12:18:09.712515",
  "modified_by": "Administrator",
  "module": "AKF Projects",
  "name": "Project",
@@ -498,7 +498,6 @@
    "write": 1
   }
  ],
- "quick_entry": 1,
  "search_fields": "project_name,customer, status, priority, is_active",
  "show_name_in_global_search": 1,
  "sort_field": "modified",

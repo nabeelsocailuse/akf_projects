@@ -14,7 +14,6 @@ frappe.ui.form.on("Task", {
 	},
 
 	onload: function (frm) {
-        console.log("task override onload");
 		frm.set_query("task", "depends_on", function () {
 			let filters = {
 				name: ["!=", frm.doc.name]
@@ -35,6 +34,18 @@ frappe.ui.form.on("Task", {
 				filters: filters
 			}
 		});
+		// Mubashir Bashir 28-04-25 Start
+		frm.set_query("custom_predecessor", function () {
+			let filters = {
+				"is_group": 0,
+				"name": ["!=", frm.doc.name]
+			};
+			if (frm.doc.project) filters["project"] = frm.doc.project;
+			return {
+				filters: filters
+			}
+		});
+		// Mubashir Bashir 28-04-25 End
 	},
 
 	is_group: function (frm) {

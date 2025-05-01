@@ -5,6 +5,7 @@
  "doctype": "DocType",
  "engine": "InnoDB",
  "field_order": [
+  "architect",
   "architect_name",
   "phone",
   "from_date",
@@ -12,30 +13,44 @@
  ],
  "fields": [
   {
+   "fetch_from": "architect.supplier_name",
+   "fetch_if_empty": 1,
    "fieldname": "architect_name",
    "fieldtype": "Data",
-   "label": "Architect Name"
+   "in_list_view": 1,
+   "label": "Architect Name",
+   "read_only": 1
   },
   {
    "fieldname": "phone",
    "fieldtype": "Data",
+   "in_list_view": 1,
    "label": "Phone"
   },
   {
    "fieldname": "from_date",
    "fieldtype": "Date",
+   "in_list_view": 1,
    "label": "From Date"
   },
   {
    "fieldname": "end_date",
    "fieldtype": "Date",
+   "in_list_view": 1,
    "label": "End Date"
+  },
+  {
+   "fieldname": "architect",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "Architect",
+   "options": "Supplier"
   }
  ],
  "index_web_pages_for_search": 1,
  "istable": 1,
  "links": [],
- "modified": "2025-04-25 12:27:21.621582",
+ "modified": "2025-05-01 11:36:40.873305",
  "modified_by": "Administrator",
  "module": "AKF Projects",
  "name": "Project Architect",

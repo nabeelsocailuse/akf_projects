@@ -92,8 +92,8 @@ def get_donation(filters):
 
 	pledge = frappe.db.sql(f"""
 		Select
-			-- ifnull(sum(case when (d.contribution_type='Donation' and d.status!='Return') then p.net_amount else 0 end),0) as donation_received,
-			-- ifnull(sum(case when d.status='Return' then p.net_amount else 0 end),0) as donation_returned,
+			ifnull(sum(case when (d.contribution_type='Donation' and d.status!='Return') then p.net_amount else 0 end),0) as donation_received,
+			ifnull(sum(case when d.status='Return' then p.net_amount else 0 end),0) as donation_returned,
 			ifnull(sum(case when d.contribution_type='Pledge' then (p.net_amount-p.outstanding_amount) else 0 end),0) as received_pledge,
 			ifnull(sum(case when d.contribution_type='Pledge' then p.outstanding_amount else 0 end),0) as pending_pledge
 		From
@@ -113,7 +113,7 @@ def get_donation(filters):
 	}
 	for d in pledge:
 		args.update({
-			# "donation": (d.donation_received - d.donation_returned),
+			"donation": (d.donation_received - d.donation_returned),
 			"received_pledge": d.received_pledge,
 			"pending_pledge": d.pending_pledge,
 		})

@@ -180,6 +180,7 @@ def get_purchasing(filters):
 		conditions += " and donor = %(donor)s " if(filters.get('donor')) else ""
 		conditions += " and account = %(account)s " if(filters.get('account')) else ""
 		return conditions
+	
 	return {
 		"purchased_amount": frappe.db.sql(f"""
 			Select

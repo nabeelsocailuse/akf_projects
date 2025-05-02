@@ -23,6 +23,7 @@ def get_transactions(filters=None):
 	# balance_amount = (total_allocation + received_funds -( transfered_funds + total_purchase ))
 	# balance_amount = (total_allocation -( transfered_funds + total_purchase ))
 	balance_amount = get_remaining_balance(filters)
+	balance_amount = (balance_amount - total_purchase )
 	filters.update({
 		"total_allocation": total_allocation,
 		"total_purchase": total_purchase,

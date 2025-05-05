@@ -10,7 +10,7 @@ from frappe.desk.reportview import get_match_cond
 from frappe.model.document import Document
 from frappe.query_builder import Interval
 from frappe.query_builder.functions import Count, CurDate, Date, Sum, UnixTimestamp
-from frappe.utils import add_days, flt, get_datetime, get_time, get_url, nowtime, today
+from frappe.utils import add_days, flt, get_datetime, get_time, get_url, nowtime, today, add_days, getdate
 from frappe.utils.user import is_website_user
 
 from erpnext import get_default_company
@@ -21,6 +21,11 @@ from erpnext.setup.doctype.holiday_list.holiday_list import is_holiday
 from erpnext.accounts.party import get_dashboard_info
 
 from erpnext.projects.doctype.project.project import Project
+
+
+from collections import defaultdict
+
+from akf_projects.customizations.overrides.project.task_override import reset_project_schedule, update_all_project_tasks
 
 class XProject(Project):
 	# begin: auto-generated types
@@ -145,11 +150,7 @@ class XProject(Project):
 				survey_form.save()
 
 
-
-	def copy_from_template(self):  # Mubashir Bashir
-		"""
-		Copy tasks from template based on custom_task_order.
-		"""
+	def copy_from_template(self):
 		if self.project_template and not frappe.db.get_all("Task", dict(project=self.name), limit=1):
 
 			if not self.expected_start_date:
@@ -160,94 +161,74 @@ class XProject(Project):
 			if not self.project_type:
 				self.project_type = template.project_type
 
-			# Fetch tasks from the template and sort them by custom_task_order
-			template_tasks = sorted(template.tasks, key=lambda x: x.custom_task_order)
+			# Group tasks by custom_task_order
+			grouped_tasks = defaultdict(list)
+			for task_row in template.tasks:
+				order = task_row.custom_task_order if task_row.custom_task_order is not None else float("inf")
+				grouped_tasks[order].append(task_row)
 
-			# Create tasks from template
+			sorted_orders = sorted(grouped_tasks.keys())
+
+			template_to_new_task_map = {}
 			project_tasks = []
 			tmp_task_details = []
-			previous_task_end_date = None
 
-			for task in template_tasks:
-				template_task_details = frappe.get_doc("Task", task.task)
-				tmp_task_details.append(template_task_details)
+			current_start_date = getdate(self.expected_start_date)
 
-				task = self.create_task_from_template(template_task_details, previous_task_end_date)
-				project_tasks.append(task)
+			# === First pass: create tasks (no parent set yet) ===
+			for order in sorted_orders:
+				group = grouped_tasks[order]
+				latest_end_date_in_group = current_start_date
 
-				previous_task_end_date = task.exp_end_date
+				for task_row in group:
+					template_task_details = frappe.get_doc("Task", task_row.task)
+					tmp_task_details.append(template_task_details)
+
+					new_task = self.create_task_from_template(template_task_details)
+					template_to_new_task_map[template_task_details.name] = new_task
+					project_tasks.append(new_task)
+
+					task_duration = template_task_details.duration or 1
+					end_date = add_days(current_start_date, task_duration - 1)
+					if end_date > latest_end_date_in_group:
+						latest_end_date_in_group = end_date
+
+				current_start_date = add_days(latest_end_date_in_group, 1)
+
+			# === Second pass: assign parent-child relationships ===
+			for template_task in tmp_task_details:
+				new_task = template_to_new_task_map[template_task.name]
+				if template_task.parent_task:
+					parent = template_to_new_task_map.get(template_task.parent_task)
+					if parent:
+						new_task.parent_task = parent.name
+						new_task.save()
 
 			self.dependency_mapping(tmp_task_details, project_tasks)
-
-			self.expected_end_date = previous_task_end_date
-
-
-	# def create_task_from_template(self, task_details, task_order, previous_task_end_date=None):	#Mubashir Bashir
-	def create_task_from_template(self, task_details, previous_task_end_date=None):	#Mubashir Bashir
-
-		exp_start_date = self.calculate_start_date(task_details, previous_task_end_date)
-		exp_end_date = self.calculate_end_date(task_details, exp_start_date)
-		# frappe.msgprint(f'Start Date {exp_start_date} - End Date {exp_end_date}')
-
-		# Initialize the task dictionary
-		return frappe.get_doc(
-			dict(
-				doctype="Task",
-				subject=task_details.subject,
-				project=self.name,
-				status="Open",
-				exp_start_date=exp_start_date,
-				exp_end_date=exp_end_date,
-				description=task_details.description,
-				task_weight=task_details.task_weight,
-				type=task_details.type,
-				issue=task_details.issue,
-				is_group=task_details.is_group,
-				color=task_details.color,
-				template_task=task_details.name,
-				priority=task_details.priority,
-				# custom_task_order=task_order,
-			)
-		).insert()
-
-	def calculate_start_date(self, task_details, previous_task_end_date):	#Mubashir Bashir
-		"""
-		Calculate the start date of the task.
-		For the first task, use the project's expected start date.
-		For subsequent tasks, use the next working day after the previous task's end date.
-		Adjust the start date if it falls on a holiday.
-		"""
-
-		if previous_task_end_date:
-			start_date = add_days(previous_task_end_date, 1)
-		else:
-			start_date = self.expected_start_date
-
-		holiday_list = self.holiday_list or get_holiday_list(self.company)
-		
-		while is_holiday(holiday_list, start_date):
-			start_date = add_days(start_date, 1)
-
-		return start_date
-
-	def calculate_end_date(self, task_details, start_date):	#Mubashir Bashir
-		"""
-		Calculate the end date based on the start date and duration of the task.
-		Skips holidays in the calculation.
-		"""
-		end_date = start_date
-		days_to_add = task_details.duration-1
-
-		while days_to_add > 0:			
-			end_date = add_days(end_date, 1)
-
-			if not is_holiday(self.holiday_list or get_holiday_list(self.company), end_date):
-				days_to_add -= 1
-
-		return end_date
+			reset_project_schedule(self.name)
+			update_all_project_tasks(self.name)
 
 
+	# def create_task_from_template(self, task_details, previous_task=None):
+	def create_task_from_template(self, task_details, parent_task = None):
+		task = frappe.new_doc("Task")
+		task.subject = task_details.subject
+		task.project = self.name
+		task.status = "Open"
+		task.description = task_details.description
+		task.task_weight = task_details.task_weight
+		task.type = task_details.type
+		task.issue = task_details.issue
+		task.is_group = task_details.is_group
+		task.color = task_details.color
+		task.template_task = task_details.name
+		task.priority = task_details.priority
+		task.duration = task_details.duration
+		if parent_task:
+			task.parent_task = parent_task.name
 
+		task.insert()
+		return task
 
 	def dependency_mapping(self, template_tasks, project_tasks):
 		for project_task in project_tasks:
@@ -454,7 +435,42 @@ class XProject(Project):
 			if(account_type == 'Payable'):
 				payable_balance += entry['credit'] - entry['debit']
 		return {'balance': payable_balance}
+	
+	# def calculate_start_date(self, task_details, previous_task_end_date):	#Mubashir Bashir
+	# 	"""
+	# 	Calculate the start date of the task.
+	# 	For the first task, use the project's expected start date.
+	# 	For subsequent tasks, use the next working day after the previous task's end date.
+	# 	Adjust the start date if it falls on a holiday.
+	# 	"""
+
+	# 	if previous_task_end_date:
+	# 		start_date = add_days(previous_task_end_date, 1)
+	# 	else:
+	# 		start_date = self.expected_start_date
+
+	# 	holiday_list = self.holiday_list or get_holiday_list(self.company)
 		
+	# 	while is_holiday(holiday_list, start_date):
+	# 		start_date = add_days(start_date, 1)
+
+	# 	return start_date
+
+	# def calculate_end_date(self, task_details, start_date):	#Mubashir Bashir
+	# 	"""
+	# 	Calculate the end date based on the start date and duration of the task.
+	# 	Skips holidays in the calculation.
+	# 	"""
+	# 	end_date = start_date
+	# 	days_to_add = task_details.duration-1
+
+	# 	while days_to_add > 0:			
+	# 		end_date = add_days(end_date, 1)
+
+	# 		if not is_holiday(self.holiday_list or get_holiday_list(self.company), end_date):
+	# 			days_to_add -= 1
+
+	# 	return end_date
 
 
 @frappe.whitelist()

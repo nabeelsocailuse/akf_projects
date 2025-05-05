@@ -6,20 +6,30 @@ from frappe.utils import add_days, getdate
 
 class XTask(Task):
     def validate(self):
-        if not self.flags.in_delete:
-            self.notify_donors_on_task_completion()
-            calculate_dates(self)
+        self.notify_donors_on_task_completion()
+        calculate_dates(self)
         super(XTask, self).validate()
+
+    def on_update(self):
+        if self.is_template: return
+        update_parent_tasks(self.project)
+        update_project_expected_end_date(self.project)
 
 
     def on_trash(self):      #Mubashir Bashir
         self.remove_from_all_parent_dependencies()
+        self.remove_custom_predecessor_references()
         if self.is_group:
-            self.delete_all_child_tasks()        
-        update_all_project_tasks(self.project)
-        
-        super(XTask, self).on_trash()
+            self.delete_all_child_tasks()
 
+        super(XTask, self).on_trash()
+    
+    def after_delete(self):
+        # frappe.throw("after deleter")
+        if self.is_template: return
+        reset_project_schedule(self.project)        
+        update_all_project_tasks(self.project, self.name)
+        
     def get_donors(self):   #Mubashir Bashir
         return frappe.db.sql("""
             SELECT 
@@ -63,6 +73,7 @@ class XTask(Task):
                     )
     
     def notify_donors_on_task_completion(self):     #Mubashir Bashir
+        if self.is_template: return
         previous_status = frappe.db.get_value('Task', {'name':self.name}, 'status')
         if self.status == 'Completed' and previous_status != 'Completed':
             donors = self.get_donors()
@@ -88,11 +99,32 @@ class XTask(Task):
                         )
 
     def remove_from_all_parent_dependencies(self):
+        # frappe.throw("deleting parent dependency")
         parent_tasks = frappe.get_all("Task Depends On", filters={"task": self.name}, fields=["parent"])
         for record in parent_tasks:
+            # frappe.throw(frappe.as_json(record.parent))
             parent_doc = frappe.get_doc("Task", record.parent)
             parent_doc.depends_on = [d for d in parent_doc.depends_on if d.task != self.name]
             parent_doc.save()
+        self.parent_task = ""
+        self.save()
+
+    def remove_custom_predecessor_references(self):
+        """Remove this task as a custom_predecessor from other tasks in the same project."""
+        if not self.project:
+            return
+
+        affected_tasks = frappe.get_all(
+            "Task",
+            filters={
+                "project": self.project,
+                "custom_predecessor": self.name
+            },
+            pluck="name"
+        )
+
+        for task_name in affected_tasks:
+            frappe.db.set_value("Task", task_name, "custom_predecessor", None)
 
     def delete_all_child_tasks(self):
         child_tasks = frappe.get_all("Task", filters={"parent_task": self.name}, pluck="name")
@@ -118,42 +150,53 @@ def is_holiday(date, holiday_list):
         return False
     return frappe.db.exists("Holiday", {"holiday_date": date, "parent": holiday_list})
 
-def update_all_project_tasks(project):
-    """Reschedules all tasks after a deletion or major change."""
+def update_all_project_tasks(project, task_to_skip=None):
+    """Reschedules all tasks in a project, skipping the deleted one, and updating parent and project dates."""
+    if not project:
+        return
+
     project_doc = frappe.get_doc("Project", project)
     holiday_list = project_doc.custom_task_holidays
 
-    # Fetch all non-group (child) tasks ordered properly
+    # Fetch all non-group tasks (excluding the deleted one), ordered by exp_start_date
     tasks = frappe.get_all("Task", 
-        filters={"project": project, "is_group": 0},
+        filters={
+            "project": project,
+            "is_group": 0,
+            "name": ["!=", task_to_skip] if task_to_skip else ["!=", ""]
+        },
         fields=["name", "custom_predecessor", "duration", "exp_start_date", "exp_end_date"],
-        order_by="creation asc"
+        order_by="exp_start_date asc"
     )
 
-    last_end_date = None
+    # Track completed tasks for chaining
+    task_end_map = {}
+
     for task in tasks:
         task_doc = frappe.get_doc("Task", task.name)
 
+        # Resolve start date based on predecessor or last known task
         if task_doc.custom_predecessor:
-            predecessor = frappe.get_value("Task", task_doc.custom_predecessor, ["exp_end_date"])
-            if not predecessor:
-                # If predecessor is missing (maybe deleted), clear it
+            predecessor_end = frappe.get_value("Task", task_doc.custom_predecessor, "exp_end_date")
+            if predecessor_end:
+                task_doc.exp_start_date = calculate_next_working_day(predecessor_end, 1, holiday_list)
+            else:
                 task_doc.custom_predecessor = None
-                last_end_date = None  # Reset flow
+                task_doc.exp_start_date = calculate_next_working_day(project_doc.expected_start_date, 0, holiday_list)
+        else:
+            # Chain from last known end date (if any)
+            if task_end_map:
+                last_end = max(task_end_map.values())
+                task_doc.exp_start_date = calculate_next_working_day(last_end, 1, holiday_list)
             else:
-                last_end_date = calculate_next_working_day(predecessor, 1, holiday_list)
-        if not task_doc.custom_predecessor:
-            # No predecessor, continue from last task end date or project start date
-            if last_end_date:
-                task_doc.exp_start_date = last_end_date
-            else:
-                task_doc.exp_start_date = project_doc.expected_start_date
+                task_doc.exp_start_date = calculate_next_working_day(project_doc.expected_start_date, 0, holiday_list)
 
-        # Calculate exp_end_date
+        # Calculate end date based on duration
         task_doc.exp_end_date = calculate_next_working_day(task_doc.exp_start_date, task_doc.duration - 1, holiday_list)
-        last_end_date = calculate_next_working_day(task_doc.exp_start_date, task_doc.duration, holiday_list)
-
+        
+        # Save and register this task's end date
         task_doc.save(ignore_permissions=True)
+        task_end_map[task_doc.name] = task_doc.exp_end_date
 
     update_parent_tasks(project)
     update_project_expected_end_date(project)
@@ -170,74 +213,85 @@ def update_project_expected_end_date(project):
 
     if last_task and last_task[0].exp_end_date:
         frappe.db.set_value("Project", project, "expected_end_date", last_task[0].exp_end_date)
+    # frappe.throw(f"Project end date: {last_task[0].exp_end_date}")
 
 def update_parent_tasks(project):
     """Updates parent tasks start and end dates based on their children."""
-    parent_tasks = frappe.get_all("Task", 
-        filters={"project": project, "is_group": 1},
-        fields=["name"]
-    )
+    # Get all parent (group) task names
+    parent_tasks = frappe.db.sql("""
+        SELECT name FROM `tabTask`
+        WHERE project = %s AND is_group = 1
+    """, (project,), as_dict=True)
+
+    project_doc = frappe.get_doc("Project", project)
+    holiday_list = project_doc.custom_task_holidays
 
     for parent in parent_tasks:
-        children = frappe.get_all("Task",
-            filters={"parent_task": parent.name},
-            fields=["exp_start_date", "exp_end_date", "duration"]
-        )
+        # Fetch all child tasks for this parent
+        children = frappe.db.sql("""
+            SELECT exp_start_date, exp_end_date
+            FROM `tabTask`
+            WHERE parent_task = %s
+        """, (parent.name,), as_dict=True)
+
         if children:
             start_dates = [c.exp_start_date for c in children if c.exp_start_date]
             end_dates = [c.exp_end_date for c in children if c.exp_end_date]
 
-            project_doc = frappe.get_doc("Project", project)
-            holiday_list = project_doc.custom_task_holidays
-
             if start_dates and end_dates:
                 earliest_start = min(start_dates)
                 latest_end = max(end_dates)
+                duration = calculate_duration(earliest_start, latest_end, holiday_list)
+
+                # frappe.throw(f"{earliest_start} - {latest_end}")
+
                 frappe.db.set_value("Task", parent.name, {
                     "exp_start_date": earliest_start,
                     "exp_end_date": latest_end,
-                    "duration": calculate_duration(earliest_start, latest_end, holiday_list)
+                    "duration": duration
                 })
 
 def calculate_dates(self):
     """Handles date calculation during task creation or update."""
-    if self.is_group:
+    if self.is_group or self.is_template:
         return
+    
+    reset_project_schedule(self.project)
 
-    if not self.duration or self.duration <= 0:
-        frappe.throw("Duration must be greater than 0 for child tasks.")
+    if (self.duration is None or self.duration <= 0) and (not (self.exp_start_date and self.exp_end_date)):
+        frappe.throw("Project timeline is required: provide either a duration or both expected start and end dates.")
 
+    
+    if not self.project: frappe.throw("Please select Project")
     project_doc = frappe.get_doc("Project", self.project)
     holiday_list = project_doc.custom_task_holidays
 
-    # if self.exp_start_date and self.exp_end_date:
-    #     self.duration = calculate_duration(self.exp_start_date, self.exp_end_date, holiday_list)
-    # else:
-    if self.custom_predecessor:
-        predecessor_end_date = frappe.get_value("Task", self.custom_predecessor, "exp_end_date")
-        if predecessor_end_date:
-            self.exp_start_date = calculate_next_working_day(predecessor_end_date, 1, holiday_list)
-        else:
-            self.custom_predecessor = None
-            self.exp_start_date = project_doc.expected_start_date
+    if self.exp_start_date and self.exp_end_date:
+        self.duration = calculate_duration(self.exp_start_date, self.exp_end_date, holiday_list)
     else:
-        last_task = frappe.db.sql("""
-            SELECT exp_end_date 
-            FROM `tabTask`
-            WHERE project = %s AND name != %s AND is_group = 0
-            ORDER BY exp_end_date DESC
-            LIMIT 1
-        """, (self.project, self.name), as_dict=True)
-
-        if last_task and last_task[0].exp_end_date:
-            self.exp_start_date = calculate_next_working_day(last_task[0].exp_end_date, 1, holiday_list)
+        if self.custom_predecessor:
+            predecessor_end_date = frappe.get_value("Task", self.custom_predecessor, "exp_end_date")
+            if predecessor_end_date:
+                self.exp_start_date = calculate_next_working_day(predecessor_end_date, 1, holiday_list)
+            else:
+                self.custom_predecessor = None
+                self.exp_start_date = calculate_next_working_day(project_doc.expected_start_date, 0, holiday_list)
         else:
-            self.exp_start_date = project_doc.expected_start_date
+            last_task = frappe.db.sql("""
+                SELECT exp_end_date 
+                FROM `tabTask`
+                WHERE project = %s AND name != %s AND is_group = 0
+                ORDER BY exp_end_date DESC
+                LIMIT 1
+            """, (self.project, self.name), as_dict=True)
 
-    self.exp_end_date = calculate_next_working_day(self.exp_start_date, self.duration - 1, holiday_list)
-        
-    update_parent_tasks(self.project)
-    update_project_expected_end_date(self.project)
+            if last_task and last_task[0].exp_end_date:
+                self.exp_start_date = calculate_next_working_day(last_task[0].exp_end_date, 1, holiday_list)
+            else:
+                self.exp_start_date = calculate_next_working_day(project_doc.expected_start_date, 0, holiday_list)
+
+        self.exp_end_date = calculate_next_working_day(self.exp_start_date, self.duration - 1, holiday_list)
+
 
 def calculate_duration(start_date, end_date, holiday_list):
     """Calculate number of working days between start and end dates inclusive."""
@@ -252,6 +306,29 @@ def calculate_duration(start_date, end_date, holiday_list):
             days += 1
         current = add_days(current, 1)
     return days
+
+def reset_project_schedule(project):
+    """Clears expected_end_date of project and date fields of all parent tasks."""
+    if not project:
+        return
+
+    # Clear project expected_end_date
+    frappe.db.set_value("Project", project, "expected_end_date", None)
+
+    # Get all parent (group) tasks for this project
+    parent_tasks = frappe.get_all("Task", filters={
+        "project": project,
+        "is_group": 1
+    }, fields=["name"])
+
+    # Clear date fields in parent tasks
+    for task in parent_tasks:
+        frappe.db.set_value("Task", task.name, {
+            "exp_start_date": None,
+            "exp_end_date": None,
+            "duration": 0
+        })
+
 
 # Mubashir Bashir 28-4-25 End
 
@@ -310,5 +387,3 @@ def duplicate_child_tasks(old_parent_name, new_parent_name):
 #     frappe.db.sql("""
 #         DELETE FROM `tabProject` WHERE name IN (%s, %s, %s, %s)
 #     """, ('P&D-2025-000084', 'P&D-2025-000080', 'P&D-2025-000079', 'Orphan-2025-000078'))
-
-

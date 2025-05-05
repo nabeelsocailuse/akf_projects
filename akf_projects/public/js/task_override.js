@@ -14,6 +14,7 @@ frappe.ui.form.on("Task", {
 	},
 
 	onload: function (frm) {
+		
 		frm.set_query("task", "depends_on", function () {
 			let filters = {
 				name: ["!=", frm.doc.name]
@@ -77,7 +78,7 @@ frappe.ui.form.on("Task", {
 
     set_custom_buttons: function (frm) {	// Mubbashir
         if (!frm.is_new() && frm.doc.is_group) {
-            frm.add_custom_button(__('Duplicate Task with Childs'), () => {
+            frm.add_custom_button(__('Duplicate Task with Sub-Tasks'), () => {
                 frm.events.create_duplicate(frm);
             }, __("Actions"));
         }

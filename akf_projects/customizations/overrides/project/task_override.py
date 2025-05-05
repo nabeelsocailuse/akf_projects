@@ -13,7 +13,7 @@ class XTask(Task):
     def on_update(self):
         if self.is_template: return
         update_parent_tasks(self.project)
-        update_project_expected_end_date(self.project)
+        # update_project_expected_end_date(self.project)
 
 
     def on_trash(self):      #Mubashir Bashir
@@ -199,7 +199,7 @@ def update_all_project_tasks(project, task_to_skip=None):
         task_end_map[task_doc.name] = task_doc.exp_end_date
 
     update_parent_tasks(project)
-    update_project_expected_end_date(project)
+    # update_project_expected_end_date(project)
 
 def update_project_expected_end_date(project):
     """Updates project's expected_end_date from the latest task."""

@@ -212,7 +212,10 @@ def update_project_expected_end_date(project):
     """, (project,), as_dict=True)
 
     if last_task and last_task[0].exp_end_date:
-        frappe.db.set_value("Project", project, "expected_end_date", last_task[0].exp_end_date)
+        # frappe.db.set_value("Project", project, "expected_end_date", last_task[0].exp_end_date)
+        project = frappe.get_doc("Project", project)
+        project.expected_end_date = last_task[0].exp_end_date
+        project.save(ignore_version=True)
     # frappe.throw(f"Project end date: {last_task[0].exp_end_date}")
 
 def update_parent_tasks(project):

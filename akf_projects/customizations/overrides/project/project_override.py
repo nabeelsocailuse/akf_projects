@@ -108,7 +108,8 @@ class XProject(Project):
 	def validate(self):
 		super(XProject, self).validate()
 		if not self.is_new():
-			self.copy_from_template()
+			# self.copy_from_template()
+			self.enque_tasks()
 		self.send_welcome_email()
 		self.update_costing()
 		self.update_percent_complete()
@@ -126,7 +127,6 @@ class XProject(Project):
 		else:
 			self.custom_allocation_check = 0
 						
-
 	def update_survey_allocation(self):  # Mubashir Bashir 3-12-24
 		# Fetch the previous value of custom_survey_id
 		previous_survey = frappe.db.get_value("Project", {"name": self.name}, "custom_survey_id")
@@ -148,6 +148,17 @@ class XProject(Project):
 				survey_form = frappe.get_doc("Project Survey Forms", previous_survey)
 				survey_form.allocation_status = "Unallocated"
 				survey_form.save()
+	
+	# Mubashir Bashir 6-May-2025 Start
+	def enque_tasks(self):
+		frappe.enqueue("akf_projects.customizations.overrides.project.project_override.create_tasks_from_template_background",
+			project_name=self.name,
+			user=frappe.session.user,
+			queue='default',
+			now=False
+		)
+		frappe.msgprint("Creating tasks from template in background. You’ll be notified once done.", alert=True)
+	# Mubashir Bashir 6-May-2025 End
 
 
 	def copy_from_template(self):
@@ -272,7 +283,8 @@ class XProject(Project):
 		self.db_update()
 
 	def after_insert(self):
-		self.copy_from_template()
+		# self.copy_from_template()
+		self.enque_tasks()
 		if self.sales_order:
 			frappe.db.set_value("Sales Order", self.sales_order, "project", self.name)
 
@@ -609,72 +621,29 @@ def send_project_progress_report(doc):   #Mubashir Bashir
 					attachments=attachments
 				)
 
+# Mubashir Bashir 6-May-2025 Start
+@frappe.whitelist()
+def create_tasks_from_template_background(project_name, user=None):
+    frappe.set_user(user or "Administrator") 
+    project = frappe.get_doc("Project", project_name)
 
+    try:
+        project.copy_from_template()
 
-# @frappe.whitelist()
-# def send_email_attachments(doc):
-#     # Convert string to dictionary
-#     doc = json.loads(doc)
+        frappe.publish_realtime(
+            event='msgprint',
+            message='Tasks created from template successfully.',
+            user=user
+        )
+    except Exception as e:
+        frappe.log_error(frappe.get_traceback(), "Task Creation Failed")
+        frappe.publish_realtime(
+            event='msgprint',
+            message=f"Error creating tasks: {str(e)}",
+            user=user
+        )
+# Mubashir Bashir 6-May-2025 End
 
-#     project_users = frappe.get_all(
-#         "Project User",
-#         filters={"parent": doc.get("name"), "parenttype": "Project"},
-#         fields=["email", "full_name"]
-#     )
-
-#     recipients = [{'email': user.email, 'full_name': user.full_name} for user in project_users if frappe.utils.validate_email_address(user.email)]
-#     if not recipients:
-#         frappe.throw(_("No valid email addresses found in the project's user list."))
-
-#     subject = "Attachments"
-
-#     # Iterate over recipients and send personalized emails
-#     for recipient in recipients:
-#         full_name = recipient['full_name'] or "Team"
-#         message = f""" 
-#             <p>Dear {full_name},</p>
-#             <p>Please review the attached documents for more details.</p>
-#             <p>Best Regards,</p>
-#             <p><b>{doc.get('company')}</b></p>.
-#         """
-
-#         # Attachments for email
-#         attachments = [
-#             {
-#                 "print_format": "Project Progress Report",
-#                 "html": "",
-#                 "print_format_attachment": 1,
-#                 "doctype": doc.get("doctype"),
-#                 "name": doc.get("name"),
-#                 "lang": "en",
-#                 "print_letterhead": "1"
-#             },
-#             {
-#                 "print_format": "Project Completion Report",
-#                 "html": "",
-#                 "print_format_attachment": 1,
-#                 "doctype": doc.get("doctype"),
-#                 "name": doc.get("name"),
-#                 "lang": "en",
-#                 "print_letterhead": "1"
-#             }
-#         ]
-
-#         # Sending email
-#         try:
-#             frappe.sendmail(
-#                 recipients=[recipient['email']],
-#                 subject=subject,
-#                 message=message,
-#                 attachments=attachments
-#             )
-#         except Exception as e:
-#             frappe.log_error(message=str(e), title="Send Email to Project User Failed")
-#             frappe.throw(_("An error occurred while sending the email to {0}. Please check the error log for details.").format(full_name))
-    
-#     frappe.msgprint(_("Emails sent successfully to project users."))
-
-		
 
 def get_timeline_data(doctype: str, name: str) -> dict[int, int]:
 	"""Return timeline for attendance"""

@@ -15,17 +15,14 @@ class XTask(Task):
         update_parent_tasks(self.project)
         update_project_expected_end_date(self.project)
 
-
     def on_trash(self):      #Mubashir Bashir
         self.remove_from_all_parent_dependencies()
         self.remove_custom_predecessor_references()
         if self.is_group:
             self.delete_all_child_tasks()
-
         super(XTask, self).on_trash()
     
     def after_delete(self):
-        # frappe.throw("after deleter")
         if self.is_template: return
         reset_project_schedule(self.project)        
         update_all_project_tasks(self.project, self.name)
@@ -33,8 +30,7 @@ class XTask(Task):
     def get_donors(self):   #Mubashir Bashir
         return frappe.db.sql("""
             SELECT 
-                pd.donor_name, 
-                pd.email
+                pd.donor_name, pd.email
             FROM 
                 `tabDonation` d 
             INNER JOIN 
@@ -64,8 +60,7 @@ class XTask(Task):
                                 Thank you for for your continued support! <br><br>
                                 Best Regards,<br>
                                 {self.company}                                    
-                                """
-                    
+                                """                    
                     frappe.sendmail(
                         recipients = donor.get('email'),
                         subject = subject,
@@ -90,8 +85,7 @@ class XTask(Task):
                                     Thank you for for your continued support! <br><br>
                                     Best Regards,<br>
                                     {self.company}                                    
-                                    """
-                        
+                                    """                        
                         frappe.sendmail(
                             recipients = donor.get('email'),
                             subject = subject,
@@ -99,10 +93,8 @@ class XTask(Task):
                         )
 
     def remove_from_all_parent_dependencies(self):
-        # frappe.throw("deleting parent dependency")
         parent_tasks = frappe.get_all("Task Depends On", filters={"task": self.name}, fields=["parent"])
         for record in parent_tasks:
-            # frappe.throw(frappe.as_json(record.parent))
             parent_doc = frappe.get_doc("Task", record.parent)
             parent_doc.depends_on = [d for d in parent_doc.depends_on if d.task != self.name]
             parent_doc.save()
@@ -130,7 +122,6 @@ class XTask(Task):
         child_tasks = frappe.get_all("Task", filters={"parent_task": self.name}, pluck="name")
         for child in child_tasks:
             frappe.delete_doc("Task", child, force=True)
-
 # Mubashir Bashir 28-4-25 Start
 
 def calculate_next_working_day(start_date, days, holiday_list):
@@ -158,7 +149,6 @@ def update_all_project_tasks(project, task_to_skip=None):
     project_doc = frappe.get_doc("Project", project)
     holiday_list = project_doc.custom_task_holidays
 
-    # Fetch all non-group tasks (excluding the deleted one), ordered by exp_start_date
     tasks = frappe.get_all("Task", 
         filters={
             "project": project,
@@ -191,7 +181,6 @@ def update_all_project_tasks(project, task_to_skip=None):
             else:
                 task_doc.exp_start_date = calculate_next_working_day(project_doc.expected_start_date, 0, holiday_list)
 
-        # Calculate end date based on duration
         task_doc.exp_end_date = calculate_next_working_day(task_doc.exp_start_date, task_doc.duration - 1, holiday_list)
         
         # Save and register this task's end date
@@ -212,11 +201,7 @@ def update_project_expected_end_date(project):
     """, (project,), as_dict=True)
 
     if last_task and last_task[0].exp_end_date:
-        # frappe.db.set_value("Project", project, "expected_end_date", last_task[0].exp_end_date)
-        project = frappe.get_doc("Project", project)
-        project.expected_end_date = last_task[0].exp_end_date
-        project.save(ignore_version=True)
-    # frappe.throw(f"Project end date: {last_task[0].exp_end_date}")
+        frappe.db.set_value("Project", project, "expected_end_date", last_task[0].exp_end_date)
 
 def update_parent_tasks(project):
     """Updates parent tasks start and end dates based on their children."""
@@ -246,8 +231,6 @@ def update_parent_tasks(project):
                 latest_end = max(end_dates)
                 duration = calculate_duration(earliest_start, latest_end, holiday_list)
 
-                # frappe.throw(f"{earliest_start} - {latest_end}")
-
                 frappe.db.set_value("Task", parent.name, {
                     "exp_start_date": earliest_start,
                     "exp_end_date": latest_end,
@@ -257,8 +240,7 @@ def update_parent_tasks(project):
 def calculate_dates(self):
     """Handles date calculation during task creation or update."""
     if self.is_group or self.is_template:
-        return
-    
+        return    
     reset_project_schedule(self.project)
 
     if (self.duration is None or self.duration <= 0) and (not (self.exp_start_date and self.exp_end_date)):
@@ -295,7 +277,6 @@ def calculate_dates(self):
 
         self.exp_end_date = calculate_next_working_day(self.exp_start_date, self.duration - 1, holiday_list)
 
-
 def calculate_duration(start_date, end_date, holiday_list):
     """Calculate number of working days between start and end dates inclusive."""
     if not start_date or not end_date:
@@ -314,25 +295,19 @@ def reset_project_schedule(project):
     """Clears expected_end_date of project and date fields of all parent tasks."""
     if not project:
         return
-
-    # Clear project expected_end_date
+    
     frappe.db.set_value("Project", project, "expected_end_date", None)
-
-    # Get all parent (group) tasks for this project
     parent_tasks = frappe.get_all("Task", filters={
         "project": project,
         "is_group": 1
     }, fields=["name"])
 
-    # Clear date fields in parent tasks
     for task in parent_tasks:
         frappe.db.set_value("Task", task.name, {
             "exp_start_date": None,
             "exp_end_date": None,
             "duration": 0
         })
-
-
 # Mubashir Bashir 28-4-25 End
 
 @frappe.whitelist()                                  #Mubashir Bashir
@@ -341,7 +316,6 @@ def create_duplicate_tasks(prev_doc, subject):
 	prev_doc = json.loads(prev_doc)
 	parent_name = prev_doc.get("name")
 
-	# Creating the new parent task
 	new_parent = frappe.new_doc("Task")
 	new_parent.subject = subject
 	new_parent.project = prev_doc.get("project")
@@ -354,7 +328,6 @@ def create_duplicate_tasks(prev_doc, subject):
 	new_parent.custom_risk_id = prev_doc.get("custom_risk_id")
 	new_parent.insert()
 
-	# Recursively copy children
 	duplicate_child_tasks(parent_name, new_parent.name)
 
 	frappe.db.commit()
@@ -378,15 +351,5 @@ def duplicate_child_tasks(old_parent_name, new_parent_name):
 		new_child.is_group = child.is_group
 		new_child.insert()
 
-		# Recursively duplicate this child’s children
 		if child.is_group:
 			duplicate_child_tasks(child.name, new_child.name)
-
-
-
-
-# @frappe.whitelist()
-# def del_tasks():
-#     frappe.db.sql("""
-#         DELETE FROM `tabProject` WHERE name IN (%s, %s, %s, %s)
-#     """, ('P&D-2025-000084', 'P&D-2025-000080', 'P&D-2025-000079', 'Orphan-2025-000078'))

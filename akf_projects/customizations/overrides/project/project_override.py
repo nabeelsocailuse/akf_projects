@@ -212,8 +212,9 @@ class XProject(Project):
 				if template_task.parent_task:
 					parent = template_to_new_task_map.get(template_task.parent_task)
 					if parent:
-						new_task.parent_task = parent.name
-						new_task.save()
+						frappe.db.set_value("Task", new_task.name, "parent_task", parent.name)
+						# new_task.parent_task = parent.name
+						# new_task.save()
 
 			self.dependency_mapping(tmp_task_details, project_tasks)
 			reset_project_schedule(self.name)
@@ -262,8 +263,9 @@ class XProject(Project):
 		if template_task.get("parent_task") and not project_task.get("parent_task"):
 			for pt in project_tasks:
 				if pt.template_task == template_task.parent_task:
-					project_task.parent_task = pt.name
-					project_task.save()
+					# project_task.parent_task = pt.name
+					# project_task.save()
+					frappe.db.set_value("Task", project_task.name, "parent_task", pt.name)
 					break
 
 	def is_row_updated(self, row, existing_task_data, fields):
@@ -283,8 +285,8 @@ class XProject(Project):
 		self.db_update()
 
 	def after_insert(self):
-		# self.copy_from_template()
-		self.enque_tasks()
+		self.copy_from_template()
+		# self.enque_tasks()
 		if self.sales_order:
 			frappe.db.set_value("Sales Order", self.sales_order, "project", self.name)
 

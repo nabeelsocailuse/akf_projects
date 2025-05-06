@@ -107,9 +107,9 @@ class XProject(Project):
 
 	def validate(self):
 		super(XProject, self).validate()
-		if not self.is_new():
-			# self.copy_from_template()
-			self.enque_tasks()
+		# if not self.is_new():
+		# 	# self.copy_from_template()
+		# 	self.enque_tasks()
 		self.send_welcome_email()
 		self.update_costing()
 		self.update_percent_complete()

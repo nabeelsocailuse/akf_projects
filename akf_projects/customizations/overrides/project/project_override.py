@@ -108,7 +108,7 @@ class XProject(Project):
 	def validate(self):
 		super(XProject, self).validate()
 		# if not self.is_new():
-		# 	# self.copy_from_template()
+		# 	self.copy_from_template()
 		# 	self.enque_tasks()
 		self.send_welcome_email()
 		self.update_costing()
@@ -209,12 +209,16 @@ class XProject(Project):
 			# === Second pass: assign parent-child relationships ===
 			for template_task in tmp_task_details:
 				new_task = template_to_new_task_map[template_task.name]
+				# setting parent tasks
 				if template_task.parent_task:
 					parent = template_to_new_task_map.get(template_task.parent_task)
 					if parent:
 						frappe.db.set_value("Task", new_task.name, "parent_task", parent.name)
-						# new_task.parent_task = parent.name
-						# new_task.save()
+				# setting custom predecessor
+				if template_task.custom_predecessor:
+					predecessor = template_to_new_task_map.get(template_task.custom_predecessor)
+					if predecessor:
+						frappe.db.set_value("Task", new_task.name, "custom_predecessor", predecessor.name)
 
 			self.dependency_mapping(tmp_task_details, project_tasks)
 			reset_project_schedule(self.name)
@@ -249,6 +253,13 @@ class XProject(Project):
 			self.check_depends_on_value(template_task, project_task, project_tasks)
 			self.check_for_parent_tasks(template_task, project_task, project_tasks)
 
+	def check_for_parent_tasks(self, template_task, project_task, project_tasks):
+		if template_task.get("parent_task") and not project_task.get("parent_task"):
+			for pt in project_tasks:
+				if pt.template_task == template_task.parent_task:
+					frappe.db.set_value("Task", project_task.name, "parent_task", pt.name)
+					break
+
 	def check_depends_on_value(self, template_task, project_task, project_tasks):
 		if template_task.get("depends_on") and not project_task.get("depends_on"):
 			project_template_map = {pt.template_task: pt for pt in project_tasks}
@@ -258,15 +269,6 @@ class XProject(Project):
 					project_task.reload()  # reload, as it might have been updated in the previous iteration
 					project_task.append("depends_on", {"task": project_template_map.get(child_task.task).name})
 					project_task.save()
-
-	def check_for_parent_tasks(self, template_task, project_task, project_tasks):
-		if template_task.get("parent_task") and not project_task.get("parent_task"):
-			for pt in project_tasks:
-				if pt.template_task == template_task.parent_task:
-					# project_task.parent_task = pt.name
-					# project_task.save()
-					frappe.db.set_value("Task", project_task.name, "parent_task", pt.name)
-					break
 
 	def is_row_updated(self, row, existing_task_data, fields):
 		if self.get("__islocal") or not existing_task_data:

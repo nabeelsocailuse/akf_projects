@@ -11,7 +11,8 @@ class XTask(Task):
         super(XTask, self).validate()
 
     def on_update(self):
-        if self.is_template: return
+        if self.is_template: return        
+        self.propagate_date_changes()
         update_parent_tasks(self.project)
         update_project_expected_end_date(self.project)
 
@@ -24,7 +25,7 @@ class XTask(Task):
     
     def after_delete(self):
         if self.is_template: return
-        reset_project_schedule(self.project)        
+        reset_project_schedule(self.project)
         update_all_project_tasks(self.project, self.name)
         
     def get_donors(self):   #Mubashir Bashir
@@ -122,7 +123,38 @@ class XTask(Task):
         child_tasks = frappe.get_all("Task", filters={"parent_task": self.name}, pluck="name")
         for child in child_tasks:
             frappe.delete_doc("Task", child, force=True)
-# Mubashir Bashir 28-4-25 Start
+    
+    def propagate_date_changes(self, visited=None):
+        if self.is_template or self.is_group:
+            return
+
+        if visited is None:
+            visited = set()
+        if self.name in visited:
+            return
+        visited.add(self.name)
+
+        project_doc = frappe.get_doc("Project", self.project)
+        holiday_list = project_doc.custom_task_holidays
+
+        dependent_tasks = frappe.get_all("Task", {
+            "project": self.project,
+            "custom_predecessor": self.name
+        }, pluck="name")
+
+        for task_name in dependent_tasks:
+            task_doc = frappe.get_doc("Task", task_name)
+            old_start = task_doc.exp_start_date
+
+            new_start = calculate_next_working_day(self.exp_end_date, 1, holiday_list)
+            if new_start != old_start:
+                task_doc.exp_start_date = new_start
+                task_doc.exp_end_date = calculate_next_working_day(new_start, task_doc.duration - 1, holiday_list)
+                task_doc.save(ignore_permissions=True)
+                task_doc = frappe.get_doc("Task", task_name)
+                task_doc.propagate_date_changes(visited)
+
+
 
 def calculate_next_working_day(start_date, days, holiday_list):
     """Add days to start_date skipping holidays."""

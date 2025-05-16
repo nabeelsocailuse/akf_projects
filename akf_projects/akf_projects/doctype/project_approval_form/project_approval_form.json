@@ -1,44 +1,40 @@
 {
  "actions": [],
  "allow_rename": 1,
- "autoname": "format:{project_title}-{##}",
+ "autoname": "format:{project_title}-{###}",
  "creation": "2025-02-18 18:28:08.845816",
  "doctype": "DocType",
  "engine": "InnoDB",
  "field_order": [
   "project_title",
-  "project_code",
   "column_break_jwiy",
-  "project_template",
   "project_description_section",
   "project_type",
   "areain_kanal",
-  "project_initial_budgetif_any",
+  "project_initial_budget",
   "column_break_ggdv",
   "brief_project_scope",
   "land_transfer_to_akfp",
-  "project_approved_bymccccbm",
+  "project_approved_by",
+  "attachment",
   "column_break_shjr",
   "building_name",
-  "estimated_project_budget",
-  "service_area",
+  "estimated_costing",
+  "expected_start_date",
   "project_location_section",
-  "region2",
+  "region",
   "tehsil",
-  "longitude",
-  "column_break_nmqr",
-  "district2",
-  "uc",
   "latitude",
-  "project_funding_section",
-  "project_funding_source_check_all_that_apply",
+  "column_break_zokp",
+  "district",
+  "uc",
+  "longitude",
   "section_break_bzcm",
+  "head_office",
+  "rmd",
   "column_break_uwhd",
   "regional_office",
   "global",
-  "column_break_twvi",
-  "head_office",
-  "rmd",
   "column_break_xsxp",
   "requester_department",
   "not_yet",
@@ -50,21 +46,9 @@
   "anticipated",
   "column_break_aayl",
   "unknown",
-  "requester_information_section",
-  "requested_by",
-  "requester_id",
-  "column_break_vbnz",
-  "posting_date",
-  "programdepartmentsubsidiary_manager",
-  "seniormanager",
-  "column_break_uhsv",
-  "senior_manager_approver_id",
-  "director_approver_id",
-  "chairman_approver_id",
-  "column_break_dvve",
-  "senior_manager_approving_date",
-  "director_approving_date",
-  "chairman_approving_date",
+  "application_state_section",
+  "custom_state_data",
+  "custom_state_html",
   "amended_from"
  ],
  "fields": [
@@ -78,13 +62,6 @@
   {
    "fieldname": "column_break_jwiy",
    "fieldtype": "Column Break"
-  },
-  {
-   "fieldname": "project_code",
-   "fieldtype": "Link",
-   "label": "Project Code",
-   "options": "Project",
-   "read_only": 1
   },
   {
    "fieldname": "project_description_section",
@@ -121,57 +98,9 @@
    "label": "Building Name"
   },
   {
-   "fieldname": "project_initial_budgetif_any",
-   "fieldtype": "Data",
-   "label": "Project Initial Budget(If any)"
-  },
-  {
    "fieldname": "land_transfer_to_akfp",
    "fieldtype": "Data",
    "label": "Land Transfer to AKFP"
-  },
-  {
-   "fieldname": "project_approved_bymccccbm",
-   "fieldtype": "Data",
-   "label": "Project Approved By/MC/CC/CBM"
-  },
-  {
-   "fieldname": "estimated_project_budget",
-   "fieldtype": "Currency",
-   "label": "Estimated Project Budget",
-   "reqd": 1
-  },
-  {
-   "fieldname": "requester_information_section",
-   "fieldtype": "Section Break",
-   "label": "Requester Information"
-  },
-  {
-   "fetch_from": "requester_id.full_name",
-   "fieldname": "requested_by",
-   "fieldtype": "Data",
-   "label": "Requested By",
-   "read_only": 1
-  },
-  {
-   "fieldname": "column_break_vbnz",
-   "fieldtype": "Column Break"
-  },
-  {
-   "fieldname": "programdepartmentsubsidiary_manager",
-   "fieldtype": "Data",
-   "hidden": 1,
-   "label": "Program/Department/Subsidiary Manager"
-  },
-  {
-   "fieldname": "project_funding_section",
-   "fieldtype": "Section Break",
-   "label": "Project Funding"
-  },
-  {
-   "fieldname": "project_funding_source_check_all_that_apply",
-   "fieldtype": "Heading",
-   "label": "Project funding Source (check All That Apply)"
   },
   {
    "fieldname": "section_break_bzcm",
@@ -222,6 +151,49 @@
    "label": "Not Yet"
   },
   {
+   "fieldname": "project_location_section",
+   "fieldtype": "Section Break",
+   "label": "Project Location"
+  },
+  {
+   "fieldname": "tehsil",
+   "fieldtype": "Link",
+   "label": "Tehsil",
+   "options": "Tehsil"
+  },
+  {
+   "fieldname": "latitude",
+   "fieldtype": "Data",
+   "label": "Latitude"
+  },
+  {
+   "fieldname": "uc",
+   "fieldtype": "Link",
+   "label": "UC",
+   "options": "UC"
+  },
+  {
+   "fieldname": "longitude",
+   "fieldtype": "Data",
+   "label": "Longitude"
+  },
+  {
+   "fieldname": "region",
+   "fieldtype": "Link",
+   "label": "Region",
+   "options": "Region"
+  },
+  {
+   "fieldname": "district",
+   "fieldtype": "Link",
+   "label": "District",
+   "options": "District"
+  },
+  {
+   "fieldname": "column_break_zokp",
+   "fieldtype": "Column Break"
+  },
+  {
    "fieldname": "project_sponsordonor_nameif_avaliable_section",
    "fieldtype": "Section Break",
    "label": "Project Sponsor/Donor Name(if avaliable)"
@@ -262,129 +234,31 @@
    "label": "Unknown"
   },
   {
-   "fieldname": "seniormanager",
-   "fieldtype": "Section Break",
-   "label": "Project/Department Approvals"
+   "fieldname": "project_initial_budget",
+   "fieldtype": "Currency",
+   "label": "Project Initial Budget(If any)"
   },
   {
-   "fieldname": "column_break_uhsv",
-   "fieldtype": "Column Break"
+   "fieldname": "project_approved_by",
+   "fieldtype": "Select",
+   "label": "Project Approved By",
+   "options": "\nMC\nCC\nCBM"
   },
   {
-   "fieldname": "column_break_dvve",
-   "fieldtype": "Column Break"
+   "fieldname": "attachment",
+   "fieldtype": "Attach",
+   "label": "Attachment",
+   "mandatory_depends_on": "project_approved_by"
   },
   {
-   "fieldname": "project_location_section",
-   "fieldtype": "Section Break",
-   "label": "Project Location"
+   "fieldname": "estimated_costing",
+   "fieldtype": "Currency",
+   "label": "Estimated Project Budget"
   },
   {
-   "fieldname": "region2",
-   "fieldtype": "Link",
-   "label": "Region",
-   "options": "Region"
-  },
-  {
-   "fieldname": "tehsil",
-   "fieldtype": "Link",
-   "label": "Tehsil",
-   "options": "Tehsil"
-  },
-  {
-   "fieldname": "latitude",
-   "fieldtype": "Data",
-   "label": "Latitude"
-  },
-  {
-   "fieldname": "district2",
-   "fieldtype": "Link",
-   "label": "District",
-   "options": "District"
-  },
-  {
-   "fieldname": "uc",
-   "fieldtype": "Link",
-   "label": "UC",
-   "options": "UC"
-  },
-  {
-   "fieldname": "longitude",
-   "fieldtype": "Data",
-   "label": "Longitude"
-  },
-  {
-   "fieldname": "project_template",
-   "fieldtype": "Link",
-   "label": "Project Template",
-   "options": "Project Template"
-  },
-  {
-   "fieldname": "service_area",
-   "fieldtype": "Link",
-   "label": "Service Area",
-   "options": "Service Area",
-   "reqd": 1
-  },
-  {
-   "fieldname": "column_break_nmqr",
-   "fieldtype": "Column Break"
-  },
-  {
-   "fieldname": "column_break_twvi",
-   "fieldtype": "Column Break"
-  },
-  {
-   "fieldname": "requester_id",
-   "fieldtype": "Link",
-   "label": "Requester ID",
-   "options": "User",
-   "read_only": 1
-  },
-  {
-   "fieldname": "posting_date",
+   "fieldname": "expected_start_date",
    "fieldtype": "Date",
-   "label": "Posting Date",
-   "read_only": 1
-  },
-  {
-   "fieldname": "senior_manager_approver_id",
-   "fieldtype": "Link",
-   "label": "Senior Manager P&D",
-   "options": "User",
-   "read_only": 1
-  },
-  {
-   "fieldname": "director_approver_id",
-   "fieldtype": "Link",
-   "label": "Director P&D",
-   "options": "User",
-   "read_only": 1
-  },
-  {
-   "fieldname": "chairman_approver_id",
-   "fieldtype": "Link",
-   "label": "Chairman P&D",
-   "options": "User",
-   "read_only": 1
-  },
-  {
-   "fieldname": "senior_manager_approving_date",
-   "fieldtype": "Date",
-   "label": "Date",
-   "read_only": 1
-  },
-  {
-   "fieldname": "director_approving_date",
-   "fieldtype": "Date",
-   "label": "Date",
-   "read_only": 1
-  },
-  {
-   "fieldname": "chairman_approving_date",
-   "fieldtype": "Date",
-   "label": "Date",
-   "read_only": 1
+   "label": "Expected Start Date"
   },
   {
    "fieldname": "amended_from",
@@ -395,12 +269,32 @@
    "print_hide": 1,
    "read_only": 1,
    "search_index": 1
+  },
+  {
+   "fieldname": "application_state_section",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "custom_state_data",
+   "fieldtype": "Code",
+   "hidden": 1,
+   "label": "State Data"
+  },
+  {
+   "fieldname": "custom_state_html",
+   "fieldtype": "HTML",
+   "label": "State HTML"
   }
  ],
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
- "links": [],
- "modified": "2025-04-19 15:35:35.941782",
+ "links": [
+  {
+   "link_doctype": "Project",
+   "link_fieldname": "custom_project_approval_form"
+  }
+ ],
+ "modified": "2025-05-16 15:29:14.452555",
  "modified_by": "Administrator",
  "module": "AKF Projects",
  "name": "Project Approval Form",

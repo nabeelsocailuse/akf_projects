@@ -1103,3 +1103,22 @@ def get_project_risks(project):
         fields=['risk', 'task', 'severity', 'likelihood', 'rating']
     )
 # Mubashir Bashir 17-01-2025 End
+
+# Mubashir Bashir 17-05-2025 Start
+@frappe.whitelist()
+def get_project_task_stats(project):
+    filters = {'project': project, 'is_template': 0}
+    statuses = ['Open', 'Working', 'Pending Review', 'Completed', 'Overdue']
+    stats = {status.lower().replace(' ', '_'): 0 for status in statuses}
+
+    tasks = frappe.get_all("Task", filters=filters, fields=["status"])
+
+    for task in tasks:
+        key = task.status.lower().replace(' ', '_')
+        if key in stats:
+            stats[key] += 1
+
+    stats['total'] = len(tasks)
+
+    return stats
+# Mubashir Bashir 17-05-2025 End

@@ -88,6 +88,7 @@ frappe.ui.form.on("Project", {
 		loadOpenStreetMap();
 		loadDonorsDashboard(frm);
 		loadRisksConnection(frm); //  Mubashir Bashir 17-01-2025
+		loadTaskStatsSection(frm); //  Mubashir Bashir 17-05-2025
 		setTimeout(() => toggle_risk_buttons(frm), 100); // Mubashir Bashir 22-04-2025
 
 		//  Mubashir Bashir 17-01-2025 Start
@@ -435,7 +436,6 @@ function loadRisksConnection(frm) {
                 
                 $('.form-dashboard-section').last().after(risks_html);
                 
-                // Add click handler for collapse indicator
                 $('.custom-risks-section .section-head').on('click', function() {
                     $(this).find('.collapse-indicator i').toggleClass('fa-chevron-up fa-chevron-down');
                 });
@@ -451,7 +451,88 @@ function getRatingClass(rating) {
     if (rating >= 25) return 'yellow';
     return 'green';
 }
-// Mubashir Bashir 17-01-2025 End
+
+function loadTaskStatsSection(frm) {
+    if (frm.is_new()) return;
+
+    $('.custom-task-stats-section').remove();
+
+    frappe.call({
+        method: 'akf_projects.customizations.overrides.project.project_override.get_project_task_stats',
+        args: {
+            project: frm.doc.name
+        },
+        callback: function(r) {
+            if (r.message) {
+                let stats = r.message;
+                let completion = stats.total > 0 ? ((stats.completed / stats.total) * 100).toFixed(1) : 0;
+
+                let html = `
+                    <div class="form-dashboard-section custom-task-stats-section" style="margin-bottom: 16px;">
+                        <div class="section-head" data-toggle="collapse" data-target="#task-stats-section" style="cursor: pointer; display: flex; justify-content: space-between; align-items: center;">
+                            <span style="font-weight: 600;">Task Overview</span>
+                            <span class="collapse-indicator mb-1">
+                                <i class="fa fa-chevron-up"></i>
+                            </span>
+                        </div>
+                        <div id="task-stats-section" class="collapse show">
+                            <div class="row" style="margin-top: 12px;">
+                                ${renderStatCard("Total Tasks", stats.total, "fa-tasks", "#6c757d")}
+                                ${renderStatCard("Open", stats.open, "fa-folder-open", "#007bff")}
+                                ${renderStatCard("Working", stats.working, "fa-spinner", "#17a2b8")}
+                                ${renderStatCard("Pending Review", stats.pending_review, "fa-hourglass-half", "#ffc107")}
+                                ${renderStatCard("Completed", stats.completed, "fa-check-circle", "#28a745")}
+                                ${renderStatCard("Overdue", stats.overdue, "fa-exclamation-circle", "#dc3545")}
+
+                                <div class="col-sm-12 mt-3">
+                                    <div style="background: var(--card-bg); padding: 16px; border-radius: 8px; border: 1px solid var(--border-color);">
+                                        <div style="display: flex; justify-content: space-between; align-items: center;">
+                                            <strong style="font-size: 14px;">Completion</strong>
+                                            <span style="font-size: 14px;">${completion}%</span>
+                                        </div>
+                                        <div class="progress mt-2" style="height: 8px;">
+                                            <div class="progress-bar bg-success" role="progressbar" style="width: ${completion}%"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+
+                $('.form-dashboard-section').last().after(html);
+
+                $('.custom-task-stats-section .section-head').on('click', function() {
+                    $(this).find('.collapse-indicator i').toggleClass('fa-chevron-up fa-chevron-down');
+                });
+            }
+        }
+    });
+
+    function renderStatCard(label, value, icon, color) {
+        return `
+            <div class="col-sm-4 mb-2">
+                <div style="
+                    background: var(--card-bg); 
+                    border-radius: 8px; 
+                    padding: 12px 15px; 
+                    border: 1px solid var(--border-color);
+                    display: flex;
+                    align-items: center;
+                    gap: 12px;
+                ">
+                    <i class="fa ${icon}" style="color: ${color}; font-size: 18px;"></i>
+                    <div>
+                        <div style="font-size: 13px; color: var(--text-muted);">${label}</div>
+                        <div style="font-size: 16px; font-weight: 600;">${value}</div>
+                    </div>
+                </div>
+            </div>
+        `;
+    }
+}
+
+
 function toggle_risk_buttons(frm) {
     const is_new = frm.is_new();
 
@@ -470,8 +551,6 @@ function toggle_risk_buttons(frm) {
         risk_table.refresh();
     }
 }
-	// Mubashir Bashir 13/1/25 Start
-// Risk Register Child Table Triggers for rating
 
 frappe.ui.form.on('Risk Register Child', {
     severity: function (frm, cdt, cdn) {

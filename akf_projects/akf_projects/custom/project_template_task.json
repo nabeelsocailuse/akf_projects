@@ -83,7 +83,7 @@
    "fetch_if_empty": 0,
    "fieldname": "custom_task_order",
    "fieldtype": "Int",
-   "hidden": 0,
+   "hidden": 1,
    "hide_border": 0,
    "hide_days": 0,
    "hide_seconds": 0,

@@ -159,6 +159,7 @@
    "collapsible": 1,
    "fieldname": "customer_details",
    "fieldtype": "Section Break",
+   "hidden": 1,
    "label": "Customer Details",
    "oldfieldtype": "Section Break",
    "options": "fa fa-user"
@@ -461,7 +462,7 @@
  "index_web_pages_for_search": 1,
  "links": [],
  "max_attachments": 4,
- "modified": "2025-05-01 12:18:09.712515",
+ "modified": "2025-05-23 09:58:20.376868",
  "modified_by": "Administrator",
  "module": "AKF Projects",
  "name": "Project",

@@ -287,8 +287,8 @@ class XProject(Project):
 		self.db_update()
 
 	def after_insert(self):
-		self.copy_from_template()
-		# self.enque_tasks()
+		# self.copy_from_template()
+		self.enque_tasks()
 		if self.sales_order:
 			frappe.db.set_value("Sales Order", self.sales_order, "project", self.name)
 

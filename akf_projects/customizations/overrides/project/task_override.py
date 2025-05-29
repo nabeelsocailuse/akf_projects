@@ -11,10 +11,18 @@ class XTask(Task):
         super(XTask, self).validate()
 
     def on_update(self):
-        if self.is_template: return        
-        self.propagate_date_changes()
-        update_parent_tasks(self.project)
-        update_project_expected_end_date(self.project)
+        if self.is_template: return
+        # self.propagate_date_changes()
+        # update_parent_tasks(self.project)
+        # update_project_expected_end_date(self.project)        
+        # Queue the sequence of updates in the background
+        frappe.enqueue(
+            "akf_projects.customizations.overrides.project.task_override.process_task_updates",
+            task_name=self.name,
+            project=self.project,
+            queue='default',
+            now=False
+        )
 
     def on_trash(self):      #Mubashir Bashir
         self.remove_from_all_parent_dependencies()
@@ -25,9 +33,15 @@ class XTask(Task):
     
     def after_delete(self):
         if self.is_template: return
-        reset_project_schedule(self.project)
-        update_all_project_tasks(self.project, self.name)
-        
+        # Queue the delete operations in the background
+        frappe.enqueue(
+            "akf_projects.customizations.overrides.project.task_override.process_task_deletion",
+            task_name=self.name,
+            project=self.project,
+            queue='default',
+            now=False
+        )
+
     def get_donors(self):   #Mubashir Bashir
         return frappe.db.sql("""
             SELECT 
@@ -178,49 +192,14 @@ def update_all_project_tasks(project, task_to_skip=None):
     if not project:
         return
 
-    project_doc = frappe.get_doc("Project", project)
-    holiday_list = project_doc.custom_task_holidays
-
-    tasks = frappe.get_all("Task", 
-        filters={
-            "project": project,
-            "is_group": 0,
-            "name": ["!=", task_to_skip] if task_to_skip else ["!=", ""]
-        },
-        fields=["name", "custom_predecessor", "duration", "exp_start_date", "exp_end_date"],
-        order_by="exp_start_date asc"
+    # Queue the update operation in the background
+    frappe.enqueue(
+        "akf_projects.customizations.overrides.project.task_override.process_project_tasks_update",
+        project=project,
+        task_to_skip=task_to_skip,
+        queue='default',
+        now=False
     )
-
-    # Track completed tasks for chaining
-    task_end_map = {}
-
-    for task in tasks:
-        task_doc = frappe.get_doc("Task", task.name)
-
-        # Resolve start date based on predecessor or last known task
-        if task_doc.custom_predecessor:
-            predecessor_end = frappe.get_value("Task", task_doc.custom_predecessor, "exp_end_date")
-            if predecessor_end:
-                task_doc.exp_start_date = calculate_next_working_day(predecessor_end, 1, holiday_list)
-            else:
-                task_doc.custom_predecessor = None
-                task_doc.exp_start_date = calculate_next_working_day(project_doc.expected_start_date, 0, holiday_list)
-        else:
-            # Chain from last known end date (if any)
-            if task_end_map:
-                last_end = max(task_end_map.values())
-                task_doc.exp_start_date = calculate_next_working_day(last_end, 1, holiday_list)
-            else:
-                task_doc.exp_start_date = calculate_next_working_day(project_doc.expected_start_date, 0, holiday_list)
-
-        task_doc.exp_end_date = calculate_next_working_day(task_doc.exp_start_date, task_doc.duration - 1, holiday_list)
-        
-        # Save and register this task's end date
-        task_doc.save(ignore_permissions=True)
-        task_end_map[task_doc.name] = task_doc.exp_end_date
-
-    update_parent_tasks(project)
-    update_project_expected_end_date(project)
 
 def update_project_expected_end_date(project):
     """Updates project's expected_end_date from the latest task."""
@@ -344,44 +323,141 @@ def reset_project_schedule(project):
 
 @frappe.whitelist()                                  #Mubashir Bashir
 def create_duplicate_tasks(prev_doc, subject):
-	import json
-	prev_doc = json.loads(prev_doc)
-	parent_name = prev_doc.get("name")
+    import json
+    prev_doc = json.loads(prev_doc)
+    parent_name = prev_doc.get("name")
 
-	new_parent = frappe.new_doc("Task")
-	new_parent.subject = subject
-	new_parent.project = prev_doc.get("project")
-	new_parent.is_group = 1
-	new_parent.status = "Open"
-	new_parent.description = prev_doc.get("description")
-	new_parent.exp_start_date = prev_doc.get("exp_start_date")
-	new_parent.exp_end_date = prev_doc.get("exp_end_date")
-	new_parent.priority = prev_doc.get("priority")
-	new_parent.custom_risk_id = prev_doc.get("custom_risk_id")
-	new_parent.insert()
+    new_parent = frappe.new_doc("Task")
+    new_parent.subject = subject
+    new_parent.project = prev_doc.get("project")
+    new_parent.is_group = 1
+    new_parent.status = "Open"
+    new_parent.description = prev_doc.get("description")
+    new_parent.exp_start_date = prev_doc.get("exp_start_date")
+    new_parent.exp_end_date = prev_doc.get("exp_end_date")
+    new_parent.priority = prev_doc.get("priority")
+    new_parent.custom_risk_id = prev_doc.get("custom_risk_id")
+    new_parent.insert()
 
-	duplicate_child_tasks(parent_name, new_parent.name)
+    # Queue the child task duplication in the background
+    frappe.enqueue(
+        "akf_projects.customizations.overrides.project.task_override.process_task_duplication",
+        old_parent_name=parent_name,
+        new_parent_name=new_parent.name,
+        queue='default',
+        now=False
+    )
 
-	frappe.db.commit()
-	return new_parent.name
+    frappe.db.commit()
+    return new_parent.name
 
+def process_task_duplication(old_parent_name, new_parent_name):
+    """Process task duplication in the background"""
+    try:
+        duplicate_child_tasks(old_parent_name, new_parent_name)
+        frappe.db.commit()
+    except Exception as e:
+        frappe.log_error(f"Error in process_task_duplication: {str(e)}", "Task Duplication Error")
+        frappe.db.rollback()
 
 def duplicate_child_tasks(old_parent_name, new_parent_name):
-	child_tasks = frappe.get_all("Task", filters={"parent_task": old_parent_name}, fields=["*"])
+    """Duplicate child tasks from old parent to new parent"""
+    child_tasks = frappe.get_all("Task", filters={"parent_task": old_parent_name}, fields=["*"])
 
-	for child in child_tasks:
-		new_child = frappe.new_doc("Task")
-		new_child.subject = child.subject
-		new_child.project = child.project
-		new_child.status = "Open"
-		new_child.description = child.description
-		new_child.exp_start_date = child.exp_start_date
-		new_child.exp_end_date = child.exp_end_date
-		new_child.priority = child.priority
-		new_child.parent_task = new_parent_name
-		new_child.custom_risk_id = child.custom_risk_id
-		new_child.is_group = child.is_group
-		new_child.insert()
+    for child in child_tasks:
+        new_child = frappe.new_doc("Task")
+        new_child.subject = child.subject
+        new_child.project = child.project
+        new_child.status = "Open"
+        new_child.description = child.description
+        new_child.exp_start_date = child.exp_start_date
+        new_child.exp_end_date = child.exp_end_date
+        new_child.priority = child.priority
+        new_child.parent_task = new_parent_name
+        new_child.custom_risk_id = child.custom_risk_id
+        new_child.is_group = child.is_group
+        new_child.insert()
 
-		if child.is_group:
-			duplicate_child_tasks(child.name, new_child.name)
+        if child.is_group:
+            duplicate_child_tasks(child.name, new_child.name)
+
+def process_task_deletion(task_name, project):
+    """Process task deletion operations in the background"""
+    try:
+        reset_project_schedule(project)
+        update_all_project_tasks(project, task_name)
+        frappe.db.commit()
+    except Exception as e:
+        frappe.log_error(f"Error in process_task_deletion: {str(e)}", "Task Deletion Error")
+        frappe.db.rollback()
+
+def process_project_tasks_update(project, task_to_skip=None):
+    """Process project tasks update in the background"""
+    try:
+        project_doc = frappe.get_doc("Project", project)
+        holiday_list = project_doc.custom_task_holidays
+
+        tasks = frappe.get_all("Task", 
+            filters={
+                "project": project,
+                "is_group": 0,
+                "name": ["!=", task_to_skip] if task_to_skip else ["!=", ""]
+            },
+            fields=["name", "custom_predecessor", "duration", "exp_start_date", "exp_end_date"],
+            order_by="exp_start_date asc"
+        )
+
+        # Track completed tasks for chaining
+        task_end_map = {}
+
+        for task in tasks:
+            task_doc = frappe.get_doc("Task", task.name)
+
+            # Resolve start date based on predecessor or last known task
+            if task_doc.custom_predecessor:
+                predecessor_end = frappe.get_value("Task", task_doc.custom_predecessor, "exp_end_date")
+                if predecessor_end:
+                    task_doc.exp_start_date = calculate_next_working_day(predecessor_end, 1, holiday_list)
+                else:
+                    task_doc.custom_predecessor = None
+                    task_doc.exp_start_date = calculate_next_working_day(project_doc.expected_start_date, 0, holiday_list)
+            else:
+                # Chain from last known end date (if any)
+                if task_end_map:
+                    last_end = max(task_end_map.values())
+                    task_doc.exp_start_date = calculate_next_working_day(last_end, 1, holiday_list)
+                else:
+                    task_doc.exp_start_date = calculate_next_working_day(project_doc.expected_start_date, 0, holiday_list)
+
+            task_doc.exp_end_date = calculate_next_working_day(task_doc.exp_start_date, task_doc.duration - 1, holiday_list)
+            
+            # Save and register this task's end date
+            task_doc.save(ignore_permissions=True)
+            task_end_map[task_doc.name] = task_doc.exp_end_date
+
+        update_parent_tasks(project)
+        update_project_expected_end_date(project)
+        frappe.db.commit()
+    except Exception as e:
+        frappe.log_error(f"Error in process_project_tasks_update: {str(e)}", "Project Tasks Update Error")
+        frappe.db.rollback()
+
+def process_task_updates(task_name, project):
+    """Process task updates in the correct sequence in the background"""
+    try:
+        # Get the task document
+        task_doc = frappe.get_doc("Task", task_name)
+        
+        # Step 1: Propagate date changes
+        task_doc.propagate_date_changes()
+        
+        # Step 2: Update parent tasks
+        update_parent_tasks(project)
+        
+        # Step 3: Update project expected end date
+        update_project_expected_end_date(project)
+        
+        frappe.db.commit()
+    except Exception as e:
+        frappe.log_error(f"Error in process_task_updates: {str(e)}", "Task Update Error")
+        frappe.db.rollback()

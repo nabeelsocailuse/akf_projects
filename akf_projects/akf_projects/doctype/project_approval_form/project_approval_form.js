@@ -15,6 +15,7 @@ frappe.ui.form.on("Project Approval Form", {
                     estimated_costing: frm.doc.estimated_costing,
                     custom_project_approval_form: frm.doc.name,
                     project_type: frm.doc.project_type, 
+                    fund_class: frm.doc.fund_class, 
                 };
                 frappe.set_route("Form", "Project", "new-project");
             });            

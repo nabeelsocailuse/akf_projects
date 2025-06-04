@@ -8,6 +8,7 @@
  "field_order": [
   "project_title",
   "column_break_jwiy",
+  "fund_class",
   "project_description_section",
   "project_type",
   "areain_kanal",
@@ -284,6 +285,12 @@
    "fieldname": "custom_state_html",
    "fieldtype": "HTML",
    "label": "State HTML"
+  },
+  {
+   "fieldname": "fund_class",
+   "fieldtype": "Link",
+   "label": "Fund Class",
+   "options": "Fund Class"
   }
  ],
  "index_web_pages_for_search": 1,
@@ -294,7 +301,7 @@
    "link_fieldname": "custom_project_approval_form"
   }
  ],
- "modified": "2025-05-16 15:29:14.452555",
+ "modified": "2025-06-04 14:21:26.673971",
  "modified_by": "Administrator",
  "module": "AKF Projects",
  "name": "Project Approval Form",

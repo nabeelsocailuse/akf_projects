@@ -16,6 +16,7 @@
   "percent_complete_method",
   "percent_complete",
   "column_break_5",
+  "freeze",
   "project_template",
   "expected_start_date",
   "expected_end_date",
@@ -455,6 +456,13 @@
    "fieldtype": "Data",
    "label": "Project Name",
    "reqd": 1
+  },
+  {
+   "default": "0",
+   "fieldname": "freeze",
+   "fieldtype": "Check",
+   "label": "Freeze",
+   "read_only": 1
   }
  ],
  "icon": "fa fa-puzzle-piece",
@@ -462,7 +470,7 @@
  "index_web_pages_for_search": 1,
  "links": [],
  "max_attachments": 4,
- "modified": "2025-06-02 15:02:58.911415",
+ "modified": "2025-07-15 12:52:46.365549",
  "modified_by": "Administrator",
  "module": "AKF Projects",
  "name": "Project",

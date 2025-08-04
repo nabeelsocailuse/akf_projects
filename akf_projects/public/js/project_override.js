@@ -123,6 +123,10 @@ frappe.ui.form.on("Project", {
 				frm.events.send_project_completion_report(frm);
 			}, __("Actions"));
 
+			frm.add_custom_button(__('Performance Report'), () => {
+				show_performance_report(frm);
+			}, __("Actions"));
+
 
 			if (frappe.model.can_read("Task")) {
 				frm.add_custom_button(__("Gantt Chart"), function () {
@@ -469,7 +473,7 @@ function loadTaskStatsSection(frm) {
 
                 let html = `
                     <div class="form-dashboard-section custom-task-stats-section" style="margin-bottom: 16px;">
-                        <div class="section-head" data-toggle="collapse" data-target="#task-stats-section" style="cursor: pointer; display: flex; justify-content: space-between; align-items: center;">
+                        <div class="section-head" data-toggle="collapse" data-target="#task-stats-section" style="cursor: pointer; display: flex; align-items: center;">
                             <span style="font-weight: 600;">Task Overview</span>
                             <span class="collapse-indicator mb-1">
                                 <i class="fa fa-chevron-up"></i>
@@ -602,5 +606,144 @@ function redirect_to_task_list(frm, cdt, cdn) {
 	frappe.set_route('List', 'Task', {
         project: frm.doc.name,
         custom_risk_id: child.risk
+    });
+}
+
+
+
+
+
+
+
+// function show_performance_report(frm) {
+//     frappe.call({
+//         method: "akf_projects.customizations.overrides.project.project_override.get_project_performance_metrics",
+//         args: {
+//             project: frm.doc.name,
+//             budget: frm.doc.estimated_costing
+//         },
+//         callback: function (r) {
+//             if (r.message) {
+//                 const data = r.message;
+
+//                 let content_html = `
+//                     <div style="font-family: 'Segoe UI', Roboto, sans-serif; font-size: 14px; color: #333;">
+//                         <h3 style="border-bottom: 1px solid #ccc; padding-bottom: 4px;">📊 Performance Summary</h3>
+
+//                         <table style="width: 100%; border-collapse: collapse; margin-top: 10px;">
+//                             <tr>
+//                                 <td><b>Total Tasks:</b></td>
+//                                 <td>${data.total_tasks}</td>
+//                             </tr>
+//                             <tr>
+//                                 <td><b>Completed Tasks:</b></td>
+//                                 <td>${data.completed_tasks}</td>
+//                             </tr>
+//                             <tr>
+//                                 <td><b>Tasks Due Till Today:</b></td>
+//                                 <td>${data.tasks_due_till_today}</td>
+//                             </tr>
+//                             <tr>
+//                                 <td><b>Budget (D):</b></td>
+//                                 <td>${format_currency(data.budget)}</td>
+//                             </tr>
+//                             <tr>
+//                                 <td><b>Actual Cost (AC):</b></td>
+//                                 <td>${format_currency(data.actual_cost)}</td>
+//                             </tr>
+//                             <tr>
+//                                 <td><b>Earned Value (EV):</b></td>
+//                                 <td>${format_currency(data.earned_value)}</td>
+//                             </tr>
+//                             <tr>
+//                                 <td><b>Planned Value (PV):</b></td>
+//                                 <td>${format_currency(data.planned_value)}</td>
+//                             </tr>
+//                             <tr style="color: ${data.cost_variance >= 0 ? 'green' : 'red'};">
+//                                 <td><b>Cost Variance (CV):</b></td>
+//                                 <td>${format_currency(data.cost_variance)} (${data.cost_variance >= 0 ? '🟢 Under budget' : '🔴 Over budget'})</td>
+//                             </tr>
+//                             <tr style="color: ${data.schedule_variance >= 0 ? 'green' : 'red'};">
+//                                 <td><b>Schedule Variance (SV):</b></td>
+//                                 <td>${format_currency(data.schedule_variance)} (${data.schedule_variance >= 0 ? '🟢 Ahead of schedule' : '🔴 Behind schedule'})</td>
+//                             </tr>
+//                         </table>
+//                     </div>
+//                 `;
+
+//                 let d = new frappe.ui.Dialog({
+//                     title: 'Project Performance Report',
+//                     size: 'large',
+//                     primary_action_label: 'Close',
+//                     primary_action() {
+//                         d.hide();
+//                     }
+//                 });
+
+//                 d.$body.append(content_html);
+//                 d.show();
+//             }
+//         }
+//     });
+// }
+
+function show_performance_report(frm) {
+    frappe.call({
+        method: "akf_projects.customizations.overrides.project.project_override.get_project_performance_metrics",
+        args: {
+            project: frm.doc.name,
+            budget: frm.doc.estimated_costing
+        },
+        callback: function (r) {
+            if (r.message) {
+                const data = r.message;
+                const completion_ratio = data.total_tasks ? (data.completed_tasks / data.total_tasks) * 100 : 0;
+
+                let content_html = `
+                    <div style="font-family:'Segoe UI', Roboto, sans-serif; font-size:14px; color:#333;">
+                        <h3 style="border-bottom: 1px solid #ccc; padding-bottom: 4px;">📊 Project Performance Summary</h3>
+
+                        <div style="margin-top: 12px;">
+                            <label><b>Task Completion:</b></label>
+                            <div style="background:#eee; border-radius:6px; overflow:hidden; height:20px; margin-bottom:10px;">
+                                <div style="width:${completion_ratio}%; background:linear-gradient(to right, #4caf50, #81c784); height:100%; text-align:center; color:white; font-size:12px;">
+                                    ${completion_ratio.toFixed(1)}%
+                                </div>
+                            </div>
+
+                            <table style="width:100%; border-collapse:collapse;">
+                                <tr><td><b>Total Tasks:</b></td><td>${data.total_tasks}</td></tr>
+                                <tr><td><b>Completed Tasks:</b></td><td>${data.completed_tasks}</td></tr>
+                                <tr><td><b>Tasks Due Till Today:</b></td><td>${data.tasks_due_till_today}</td></tr>
+                                <tr><td><b>Budget (D):</b></td><td>${format_currency(data.budget)}</td></tr>
+                                <tr><td><b>Actual Cost (AC):</b></td><td>${format_currency(data.actual_cost)}</td></tr>
+                                <tr><td><b>Earned Value (EV):</b></td><td>${format_currency(data.earned_value)}</td></tr>
+                                <tr><td><b>Planned Value (PV):</b></td><td>${format_currency(data.planned_value)}</td></tr>
+                                <tr style="color:${data.cost_variance >= 0 ? 'green' : 'red'};">
+                                    <td><b>Cost Variance (CV):</b></td>
+                                    <td>${format_currency(data.cost_variance)} (${data.cost_variance >= 0 ? '🟢 Under budget' : '🔴 Over budget'})</td>
+                                </tr>
+                                <tr style="color:${data.schedule_variance >= 0 ? 'green' : 'red'};">
+                                    <td><b>Schedule Variance (SV):</b></td>
+                                    <td>${format_currency(data.schedule_variance)} (${data.schedule_variance >= 0 ? '🟢 Ahead of schedule' : '🔴 Behind schedule'})</td>
+                                </tr>
+                            </table>
+                        </div>
+                    </div>
+                `;
+
+                let d = new frappe.ui.Dialog({
+                    title: 'Project Performance Report',
+                    size: 'large',
+                    primary_action_label: 'Close',
+                    primary_action() {
+                        d.hide();
+                    }
+                });
+
+                d.$body.append(content_html);
+                d.show();
+            }
+        }
     });
 }

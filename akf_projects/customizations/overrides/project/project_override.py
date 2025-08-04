@@ -12,6 +12,7 @@ from frappe.query_builder import Interval
 from frappe.query_builder.functions import Count, CurDate, Date, Sum, UnixTimestamp
 from frappe.utils import add_days, flt, get_datetime, get_time, get_url, nowtime, today, add_days, getdate
 from frappe.utils.user import is_website_user
+from datetime import datetime, date
 
 from erpnext import get_default_company
 from erpnext.controllers.queries import get_filters_cond
@@ -1122,3 +1123,55 @@ def get_project_task_stats(project):
 
     return stats
 # Mubashir Bashir 17-05-2025 End
+
+
+from akf_projects.customizations.overrides.project.financial_stats import get_transactions
+@frappe.whitelist()
+def get_project_performance_metrics(project, budget):
+    total_tasks = frappe.get_all("Task", filters={'project': project, 'is_template': 0}, fields=["status", "exp_end_date"])
+    completed_tasks = frappe.get_all("Task", filters={'project': project, 'is_template': 0, 'status': 'Completed'}, fields=["exp_end_date"])
+
+    today_date = date.today()
+
+    def get_exp_end_date_as_date(exp_end_date):
+        if isinstance(exp_end_date, date):
+            return exp_end_date
+        elif isinstance(exp_end_date, str):
+            return datetime.strptime(exp_end_date, "%Y-%m-%d").date()
+        else:
+            return None
+
+    tasks_due_till_today = sum(
+        1
+        for task in total_tasks
+        if task.exp_end_date
+        and (exp_date := get_exp_end_date_as_date(task.exp_end_date))
+        and exp_date <= today_date
+    )
+
+    X = len(completed_tasks)
+    Y = len(total_tasks)
+    T = tasks_due_till_today
+    D = float(budget) if budget else 0
+
+    financial_data = get_transactions({'project': project})
+    AC = financial_data.get('total_purchase', 0)
+
+    EV = (X * (D / Y)) if Y else 0
+    PV = (T * (D / Y)) if Y else 0
+    CV = EV - AC
+    SV = EV - PV
+
+    return {
+        "total_tasks": Y,
+        "completed_tasks": X,
+        "tasks_due_till_today": T,
+        "budget": D,
+        "actual_cost": AC,
+        "earned_value": EV,
+        "planned_value": PV,
+        "cost_variance": CV,
+        "schedule_variance": SV,
+    }
+
+

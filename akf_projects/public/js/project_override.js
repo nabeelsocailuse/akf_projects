@@ -282,15 +282,15 @@ function loadFundsDashboard(frm) {
 				frm.dashboard.add_indicator(__('Total Allocation: {0}',
 					[format_currency(data.total_allocation)]), 'green');
 				
-				frm.dashboard.add_indicator(__('Pledge Amount: {0}',
-					[format_currency(data.total_pledge)]),
-					'yellow');
+				// frm.dashboard.add_indicator(__('Pledge Amount: {0}',
+				// 	[format_currency(data.total_pledge)]),
+				// 	'yellow');
 				frm.dashboard.add_indicator(__('Transfered Funds: {0}',
 					[format_currency(data.transfered_funds)]),
 					'grey');
-				frm.dashboard.add_indicator(__('Received Funds: {0}',
-					[format_currency(data.received_funds)]),
-					'green');
+				// frm.dashboard.add_indicator(__('Received Funds: {0}',
+				// 	[format_currency(data.received_funds)]),
+				// 	'green');
 				frm.dashboard.add_indicator(__('Consumed Funds: {0}',
 					[format_currency(data.total_purchase)]),
 					'red');

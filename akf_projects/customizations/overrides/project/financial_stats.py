@@ -15,7 +15,8 @@ def get_transactions(filters=None):
 
 	# total_allocation = (donation + received_pledge + received_funds)
 	# total_allocation = args['donation'] + args['received_pledge'] +  args['received_funds']
-	total_allocation = args['donation']
+	# total_allocation = args['donation']
+	total_allocation = get_remaining_balance(filters)
 	total_pledge = args['pending_pledge']
 	transfered_funds = args['transfered_funds']
 	received_funds = args['received_funds']

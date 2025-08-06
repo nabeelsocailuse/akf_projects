@@ -149,17 +149,6 @@ class XProject(Project):
 				survey_form = frappe.get_doc("Project Survey Forms", previous_survey)
 				survey_form.allocation_status = "Unallocated"
 				survey_form.save()
-	
-	# Mubashir Bashir 6-May-2025 Start
-	def enque_tasks(self):
-		frappe.enqueue("akf_projects.customizations.overrides.project.project_override.create_tasks_from_template_background",
-			project_name=self.name,
-			user=frappe.session.user,
-			queue='default',
-			now=False
-		)
-		frappe.msgprint("Creating tasks from template in background. You’ll be notified once done.", alert=True)
-	# Mubashir Bashir 6-May-2025 End
 
 
 	def copy_from_template(self):
@@ -289,7 +278,17 @@ class XProject(Project):
 
 	def after_insert(self):
 		# self.copy_from_template()
-		self.enque_tasks()
+		# Mubashir Bashir 6-May-2025 Start
+		def enque_tasks():
+			frappe.enqueue("akf_projects.customizations.overrides.project.project_override.create_tasks_from_template_background",
+				project_name=self.name,
+				user=frappe.session.user,
+				queue='default',
+				now=False
+			)
+			frappe.msgprint("Creating tasks from template in background. You’ll be notified once done.", alert=True)
+		frappe.db.after_commit(enque_tasks)
+		# Mubashir Bashir 6-May-2025 End
 		if self.sales_order:
 			frappe.db.set_value("Sales Order", self.sales_order, "project", self.name)
 

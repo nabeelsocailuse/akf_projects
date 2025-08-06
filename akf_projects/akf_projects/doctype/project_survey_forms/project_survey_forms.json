@@ -30,7 +30,8 @@
   "allocation_status",
   "sub_service_area",
   "longitude",
-  "survey_form_json"
+  "survey_form_json",
+  "amended_from"
  ],
  "fields": [
   {
@@ -126,6 +127,7 @@
    "label": "UC"
   },
   {
+   "allow_on_submit": 1,
    "default": "Unallocated",
    "fieldname": "allocation_status",
    "fieldtype": "Select",
@@ -170,11 +172,22 @@
    "fieldtype": "Link",
    "label": "Sub Service Area",
    "options": "Subservice Area"
+  },
+  {
+   "fieldname": "amended_from",
+   "fieldtype": "Link",
+   "label": "Amended From",
+   "no_copy": 1,
+   "options": "Project Survey Forms",
+   "print_hide": 1,
+   "read_only": 1,
+   "search_index": 1
   }
  ],
  "index_web_pages_for_search": 1,
+ "is_submittable": 1,
  "links": [],
- "modified": "2025-01-03 16:26:52.305647",
+ "modified": "2025-08-06 13:11:12.796340",
  "modified_by": "Administrator",
  "module": "AKF Projects",
  "name": "Project Survey Forms",

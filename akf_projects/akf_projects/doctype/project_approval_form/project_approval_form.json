@@ -39,7 +39,7 @@
   "column_break_xsxp",
   "requester_department",
   "not_yet",
-  "project_sponsordonor_nameif_avaliable_section",
+  "project_sponsordonor_nameif_available_section",
   "funding",
   "column_break_mydm",
   "in_place",
@@ -195,11 +195,6 @@
    "fieldtype": "Column Break"
   },
   {
-   "fieldname": "project_sponsordonor_nameif_avaliable_section",
-   "fieldtype": "Section Break",
-   "label": "Project Sponsor/Donor Name(if avaliable)"
-  },
-  {
    "fieldname": "funding",
    "fieldtype": "Heading",
    "label": "Funding"
@@ -291,6 +286,11 @@
    "fieldtype": "Link",
    "label": "Fund Class",
    "options": "Fund Class"
+  },
+  {
+   "fieldname": "project_sponsordonor_nameif_available_section",
+   "fieldtype": "Section Break",
+   "label": "Project Sponsor/Donor Name(if avaliable)"
   }
  ],
  "index_web_pages_for_search": 1,
@@ -301,7 +301,7 @@
    "link_fieldname": "custom_project_approval_form"
   }
  ],
- "modified": "2025-06-04 14:21:26.673971",
+ "modified": "2025-08-08 10:25:19.861252",
  "modified_by": "Administrator",
  "module": "AKF Projects",
  "name": "Project Approval Form",

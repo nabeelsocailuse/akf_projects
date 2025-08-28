@@ -12,23 +12,38 @@ frappe.ui.form.on("Project Approval Form", {
                     custom_uc: frm.doc.uc,
                     custom_latitude: frm.doc.latitude,
                     custom_longitude: frm.doc.longitude,
-                    estimated_costing: frm.doc.estimated_costing,
+                    estimated_costing: frm.doc.estimated_project_budget,
                     custom_project_approval_form: frm.doc.name,
                     project_type: frm.doc.project_type, 
                     fund_class: frm.doc.fund_class, 
                 };
                 frappe.set_route("Form", "Project", "new-project");
-            });            
+            });
             btn.addClass("btn-primary");
         }
         /////////////////////////////
-        frm.trigger("showWorkFlowState");
+        // frm.trigger("showWorkFlowState");
+		set_filters(frm);
     },
     onload: function(frm) {
         if (frm.is_new()) {
+            frm.set_value('next_approver_id', '');
+            frm.set_value('next_approver_name', '');
             frm.set_value('custom_state_data', '');
             frm.set_value('custom_state_html', '');
         }
+		set_filters(frm);
+    },
+	region: function(frm) {
+        // clearing dependent fields
+        frm.set_value("district", "");
+        frm.set_value("tehsil", "");
+        set_filters(frm);
+    },
+    district: function(frm) {
+        // clearing tehsil when district changes
+        frm.set_value("tehsil", "");
+        set_filters(frm);
     },
     showWorkFlowState: function(frm){
 		if(frm.doc.custom_state_data==undefined) {
@@ -95,3 +110,24 @@ frappe.ui.form.on("Project Approval Form", {
 		}
 	}
 });
+
+
+function set_filters(frm) {
+    // Filter District by Region
+    frm.set_query("district", function() {
+        return {
+            filters: {
+                region: frm.doc.region
+            }
+        };
+    });
+
+    // Filter Tehsil by Region + District
+    frm.set_query("tehsil", function() {
+        return {
+            filters: {
+                district: frm.doc.district
+            }
+        };
+    });
+}

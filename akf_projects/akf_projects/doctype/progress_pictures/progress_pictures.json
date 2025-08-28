@@ -8,6 +8,7 @@
  "engine": "InnoDB",
  "field_order": [
   "image_title",
+  "date",
   "image"
  ],
  "fields": [
@@ -19,15 +20,21 @@
   },
   {
    "fieldname": "image",
-   "fieldtype": "Attach Image",
-   "in_preview": 1,
+   "fieldtype": "Attach",
+   "in_list_view": 1,
    "label": "Image"
+  },
+  {
+   "fieldname": "date",
+   "fieldtype": "Date",
+   "in_list_view": 1,
+   "label": "Date"
   }
  ],
  "index_web_pages_for_search": 1,
  "istable": 1,
  "links": [],
- "modified": "2025-05-23 10:03:20.157543",
+ "modified": "2025-08-28 11:15:01.258073",
  "modified_by": "Administrator",
  "module": "AKF Projects",
  "name": "Progress Pictures",

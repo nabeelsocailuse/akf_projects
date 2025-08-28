@@ -9,19 +9,24 @@
   "project_title",
   "column_break_jwiy",
   "fund_class",
+  "service_area",
   "project_description_section",
   "project_type",
-  "areain_kanal",
   "project_initial_budget",
+  "area",
+  "kanal",
+  "marla",
+  "sqft",
   "column_break_ggdv",
-  "brief_project_scope",
+  "structure_reference",
+  "estimated_costing",
   "land_transfer_to_akfp",
+  "reason",
+  "column_break_shjr",
+  "expected_start_date",
+  "brief_project_scope",
   "project_approved_by",
   "attachment",
-  "column_break_shjr",
-  "building_name",
-  "estimated_costing",
-  "expected_start_date",
   "project_location_section",
   "region",
   "tehsil",
@@ -32,13 +37,12 @@
   "longitude",
   "section_break_bzcm",
   "head_office",
-  "rmd",
   "column_break_uwhd",
   "regional_office",
-  "global",
   "column_break_xsxp",
-  "requester_department",
-  "not_yet",
+  "others",
+  "column_break_rxqu",
+  "other_source",
   "project_sponsordonor_nameif_available_section",
   "funding",
   "column_break_mydm",
@@ -47,6 +51,10 @@
   "anticipated",
   "column_break_aayl",
   "unknown",
+  "next_approver_section",
+  "next_approver_id",
+  "column_break_omyk",
+  "next_approver_name",
   "application_state_section",
   "custom_state_data",
   "custom_state_html",
@@ -76,17 +84,12 @@
    "options": "Project Type"
   },
   {
-   "fieldname": "areain_kanal",
-   "fieldtype": "Data",
-   "label": "Area(In kanal)"
-  },
-  {
    "fieldname": "column_break_ggdv",
    "fieldtype": "Column Break"
   },
   {
    "fieldname": "brief_project_scope",
-   "fieldtype": "Data",
+   "fieldtype": "Small Text",
    "label": "Brief Project Scope"
   },
   {
@@ -94,30 +97,21 @@
    "fieldtype": "Column Break"
   },
   {
-   "fieldname": "building_name",
-   "fieldtype": "Data",
-   "label": "Building Name"
-  },
-  {
    "fieldname": "land_transfer_to_akfp",
-   "fieldtype": "Data",
-   "label": "Land Transfer to AKFP"
+   "fieldtype": "Select",
+   "label": "Land Transfer to AKFP",
+   "options": "\nYes\nNo"
   },
   {
    "fieldname": "section_break_bzcm",
-   "fieldtype": "Section Break"
+   "fieldtype": "Section Break",
+   "label": "Project Funding"
   },
   {
    "default": "0",
    "fieldname": "head_office",
    "fieldtype": "Check",
    "label": "Head Office"
-  },
-  {
-   "default": "0",
-   "fieldname": "rmd",
-   "fieldtype": "Check",
-   "label": "RMD"
   },
   {
    "fieldname": "column_break_uwhd",
@@ -130,26 +124,8 @@
    "label": "Regional Office"
   },
   {
-   "default": "0",
-   "fieldname": "global",
-   "fieldtype": "Check",
-   "label": "Global"
-  },
-  {
    "fieldname": "column_break_xsxp",
    "fieldtype": "Column Break"
-  },
-  {
-   "default": "0",
-   "fieldname": "requester_department",
-   "fieldtype": "Check",
-   "label": "Requester Department"
-  },
-  {
-   "default": "0",
-   "fieldname": "not_yet",
-   "fieldtype": "Check",
-   "label": "Not Yet"
   },
   {
    "fieldname": "project_location_section",
@@ -238,9 +214,10 @@
    "fieldname": "project_approved_by",
    "fieldtype": "Select",
    "label": "Project Approved By",
-   "options": "\nMC\nCC\nCBM"
+   "options": "\nCMC/MC\nPresident/SG"
   },
   {
+   "depends_on": "project_approved_by",
    "fieldname": "attachment",
    "fieldtype": "Attach",
    "label": "Attachment",
@@ -291,6 +268,86 @@
    "fieldname": "project_sponsordonor_nameif_available_section",
    "fieldtype": "Section Break",
    "label": "Project Sponsor/Donor Name(if avaliable)"
+  },
+  {
+   "fieldname": "area",
+   "fieldtype": "Heading",
+   "label": "Area"
+  },
+  {
+   "fieldname": "kanal",
+   "fieldtype": "Data",
+   "label": "Kanal"
+  },
+  {
+   "fieldname": "marla",
+   "fieldtype": "Float",
+   "label": "Marla"
+  },
+  {
+   "fieldname": "sqft",
+   "fieldtype": "Float",
+   "label": "Sqft"
+  },
+  {
+   "fieldname": "structure_reference",
+   "fieldtype": "Data",
+   "label": "Structure Reference"
+  },
+  {
+   "depends_on": "eval: doc.land_transfer_to_akfp == 'No'",
+   "fieldname": "reason",
+   "fieldtype": "Small Text",
+   "label": "Reason",
+   "mandatory_depends_on": "eval: doc.land_transfer_to_akfp == 'No'"
+  },
+  {
+   "default": "0",
+   "fieldname": "others",
+   "fieldtype": "Check",
+   "label": "Others"
+  },
+  {
+   "depends_on": "eval: doc.others",
+   "fieldname": "other_source",
+   "fieldtype": "Data",
+   "label": "Other Source",
+   "mandatory_depends_on": "eval: doc.others"
+  },
+  {
+   "fieldname": "column_break_rxqu",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "next_approver_section",
+   "fieldtype": "Section Break",
+   "label": "Next Approver"
+  },
+  {
+   "fieldname": "next_approver_id",
+   "fieldtype": "Link",
+   "hidden": 1,
+   "label": "Next Approver Id",
+   "options": "User"
+  },
+  {
+   "fieldname": "column_break_omyk",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fetch_from": "next_approver_id.full_name",
+   "fieldname": "next_approver_name",
+   "fieldtype": "Data",
+   "label": "Next Approver Name",
+   "read_only": 1
+  },
+  {
+   "fieldname": "service_area",
+   "fieldtype": "Link",
+   "ignore_user_permissions": 1,
+   "label": "Service Area",
+   "options": "Service Area",
+   "reqd": 1
   }
  ],
  "index_web_pages_for_search": 1,
@@ -301,7 +358,7 @@
    "link_fieldname": "custom_project_approval_form"
   }
  ],
- "modified": "2025-08-08 10:25:19.861252",
+ "modified": "2025-08-28 11:27:28.240381",
  "modified_by": "Administrator",
  "module": "AKF Projects",
  "name": "Project Approval Form",

@@ -24,6 +24,7 @@ frappe.ui.form.on("Project Approval Form", {
         /////////////////////////////
         // frm.trigger("showWorkFlowState");
 		set_filters(frm);
+		set_fund_class_permissions(frm);
     },
     onload: function(frm) {
         if (frm.is_new()) {
@@ -33,6 +34,7 @@ frappe.ui.form.on("Project Approval Form", {
             frm.set_value('custom_state_html', '');
         }
 		set_filters(frm);
+		set_fund_class_permissions(frm);
     },
 	region: function(frm) {
         // clearing dependent fields
@@ -45,6 +47,7 @@ frappe.ui.form.on("Project Approval Form", {
         frm.set_value("tehsil", "");
         set_filters(frm);
     },
+
     showWorkFlowState: function(frm){
 		if(frm.doc.custom_state_data==undefined) {
 			frm.set_df_property('custom_state_html', 'options', '<p></p>')
@@ -109,6 +112,8 @@ frappe.ui.form.on("Project Approval Form", {
 			frm.set_df_property('custom_state_html', 'options', _html_)
 		}
 	}
+
+	
 });
 
 
@@ -130,4 +135,14 @@ function set_filters(frm) {
             }
         };
     });
+}
+
+function set_fund_class_permissions(frm) {
+    if (frappe.user.has_role("Fund Class Officer")) {
+        frm.set_df_property("fund_class", "reqd", 1);
+        frm.set_df_property("fund_class", "read_only", 0);
+    } else {
+        frm.set_df_property("fund_class", "reqd", 0);
+        frm.set_df_property("fund_class", "read_only", 1);
+    }
 }

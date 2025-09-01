@@ -13,20 +13,22 @@
   "project_description_section",
   "project_type",
   "project_initial_budget",
-  "area",
-  "kanal",
-  "marla",
-  "sqft",
+  "land_transfer_to_akfp",
+  "expected_start_date",
   "column_break_ggdv",
   "structure_reference",
   "estimated_costing",
-  "land_transfer_to_akfp",
   "reason",
   "column_break_shjr",
-  "expected_start_date",
-  "brief_project_scope",
   "project_approved_by",
   "attachment",
+  "brief_project_scope",
+  "area_section",
+  "kanal",
+  "column_break_wpjl",
+  "marla",
+  "column_break_vunv",
+  "sqft",
   "project_location_section",
   "region",
   "tehsil",
@@ -250,7 +252,6 @@
   {
    "fieldname": "custom_state_data",
    "fieldtype": "Code",
-   "hidden": 1,
    "label": "State Data"
   },
   {
@@ -262,17 +263,13 @@
    "fieldname": "fund_class",
    "fieldtype": "Link",
    "label": "Fund Class",
-   "options": "Fund Class"
+   "options": "Fund Class",
+   "permlevel": 1
   },
   {
    "fieldname": "project_sponsordonor_nameif_available_section",
    "fieldtype": "Section Break",
    "label": "Project Sponsor/Donor Name(if avaliable)"
-  },
-  {
-   "fieldname": "area",
-   "fieldtype": "Heading",
-   "label": "Area"
   },
   {
    "fieldname": "kanal",
@@ -326,9 +323,9 @@
   {
    "fieldname": "next_approver_id",
    "fieldtype": "Link",
-   "hidden": 1,
    "label": "Next Approver Id",
-   "options": "User"
+   "options": "User",
+   "read_only": 1
   },
   {
    "fieldname": "column_break_omyk",
@@ -348,6 +345,19 @@
    "label": "Service Area",
    "options": "Service Area",
    "reqd": 1
+  },
+  {
+   "fieldname": "area_section",
+   "fieldtype": "Section Break",
+   "label": "Area"
+  },
+  {
+   "fieldname": "column_break_wpjl",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "column_break_vunv",
+   "fieldtype": "Column Break"
   }
  ],
  "index_web_pages_for_search": 1,
@@ -358,7 +368,7 @@
    "link_fieldname": "custom_project_approval_form"
   }
  ],
- "modified": "2025-08-28 11:27:28.240381",
+ "modified": "2025-08-29 12:43:36.452767",
  "modified_by": "Administrator",
  "module": "AKF Projects",
  "name": "Project Approval Form",

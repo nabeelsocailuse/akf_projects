@@ -55,6 +55,7 @@ class XProject(Project):
 		expected_end_date: DF.Date | None
 		expected_start_date: DF.Date | None
 		first_email: DF.Time | None
+		freeze: DF.Check
 		frequency: DF.Literal["Hourly", "Twice Daily", "Daily", "Weekly"]
 		from_time: DF.Time | None
 		gross_margin: DF.Currency
@@ -111,6 +112,8 @@ class XProject(Project):
 		# if not self.is_new():
 		# 	self.copy_from_template()
 		# 	self.enque_tasks()
+		if not self.custom_posting_date:
+			self.custom_posting_date = today()
 		self.send_welcome_email()
 		self.update_costing()
 		self.update_percent_complete()

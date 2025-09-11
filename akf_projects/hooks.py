@@ -78,7 +78,7 @@ doctype_js = {
 
 # Uninstallation
 # ------------
-
+before_uninstall = "akf_projects.uninstall.before_uninstall"
 # before_uninstall = "akf_projects.uninstall.before_uninstall"
 # after_uninstall = "akf_projects.uninstall.after_uninstall"
 

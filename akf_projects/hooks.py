@@ -242,3 +242,13 @@ override_doctype_dashboards = {
 # 	"Logging DocType Name": 30  # days to retain logs
 # }
 
+# fixtures = [
+#     {
+#         "dt": "Custom Field",
+#         "filters": [
+#             ["dt", "in", ["Project", "Project Template", "Project Template Task", "Task"]],
+#             ["module", "in", ["AKF Projects"]]
+#         ]
+#     }
+# ]
+# bench --site al-khidmat.com export-fixtures

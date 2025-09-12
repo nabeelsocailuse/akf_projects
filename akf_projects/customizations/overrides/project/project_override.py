@@ -1103,7 +1103,8 @@ def get_project_risks(project):
             'parent': project,
             'parenttype': 'Project'
         },
-        fields=['risk', 'task', 'severity', 'likelihood', 'rating']
+        fields=['risk', 'severity', 'likelihood', 'rating']
+        # fields=['risk', 'task', 'severity', 'likelihood', 'rating']
     )
 # Mubashir Bashir 17-01-2025 End
 

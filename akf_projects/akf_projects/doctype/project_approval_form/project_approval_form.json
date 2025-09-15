@@ -252,6 +252,7 @@
   {
    "fieldname": "custom_state_data",
    "fieldtype": "Code",
+   "hidden": 1,
    "label": "State Data"
   },
   {
@@ -368,7 +369,7 @@
    "link_fieldname": "custom_project_approval_form"
   }
  ],
- "modified": "2025-08-29 12:43:36.452767",
+ "modified": "2025-09-15 12:51:10.359122",
  "modified_by": "Administrator",
  "module": "AKF Projects",
  "name": "Project Approval Form",
@@ -388,6 +389,7 @@
    "write": 1
   }
  ],
+ "row_format": "Dynamic",
  "sort_field": "modified",
  "sort_order": "DESC",
  "states": []

@@ -210,7 +210,7 @@
   {
    "fieldname": "project_initial_budget",
    "fieldtype": "Currency",
-   "label": "Project Initial Budget(If any)"
+   "label": "Project Initial Budget (If any)"
   },
   {
    "fieldname": "project_approved_by",
@@ -369,7 +369,7 @@
    "link_fieldname": "custom_project_approval_form"
   }
  ],
- "modified": "2025-09-15 12:51:10.359122",
+ "modified": "2025-09-15 13:01:49.737982",
  "modified_by": "Administrator",
  "module": "AKF Projects",
  "name": "Project Approval Form",

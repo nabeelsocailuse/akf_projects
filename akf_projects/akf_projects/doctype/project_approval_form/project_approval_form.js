@@ -186,3 +186,5 @@ function render_state_table(frm) {
 
     frm.set_df_property("custom_state_html", "options", html);
 }
+
+

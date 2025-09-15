@@ -116,5 +116,3 @@ class ProjectApprovalForm(Document):
 	# 		notification.insert(ignore_permissions=True)
 	# 		frappe.msgprint(f'Notification sent to {user.parent}')
 
-
-

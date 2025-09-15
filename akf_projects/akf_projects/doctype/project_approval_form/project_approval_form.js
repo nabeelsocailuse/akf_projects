@@ -117,7 +117,7 @@ function block_fields(frm) {
     ];
 
     if (editable_states.includes(frm.doc.workflow_state) 
-        && frappe.user_roles.includes("Program Manager")) {
+        && frappe.user_roles.includes("Program Manager") || frappe.user_roles.includes("Administrator")) {
         console.log("making fields editable for Program Manager");
             
 

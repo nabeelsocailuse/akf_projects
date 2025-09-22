@@ -247,7 +247,8 @@
   },
   {
    "fieldname": "application_state_section",
-   "fieldtype": "Section Break"
+   "fieldtype": "Section Break",
+   "label": "Approval Stats"
   },
   {
    "fieldname": "custom_state_data",
@@ -264,8 +265,7 @@
    "fieldname": "fund_class",
    "fieldtype": "Link",
    "label": "Fund Class",
-   "options": "Fund Class",
-   "permlevel": 1
+   "options": "Fund Class"
   },
   {
    "fieldname": "project_sponsordonor_nameif_available_section",
@@ -324,6 +324,7 @@
   {
    "fieldname": "next_approver_id",
    "fieldtype": "Link",
+   "hidden": 1,
    "label": "Next Approver Id",
    "options": "User",
    "read_only": 1
@@ -336,13 +337,13 @@
    "fetch_from": "next_approver_id.full_name",
    "fieldname": "next_approver_name",
    "fieldtype": "Data",
+   "hidden": 1,
    "label": "Next Approver Name",
    "read_only": 1
   },
   {
    "fieldname": "service_area",
    "fieldtype": "Link",
-   "ignore_user_permissions": 1,
    "label": "Service Area",
    "options": "Service Area",
    "reqd": 1
@@ -369,7 +370,7 @@
    "link_fieldname": "custom_project_approval_form"
   }
  ],
- "modified": "2025-09-15 13:01:49.737982",
+ "modified": "2025-09-23 00:08:44.257794",
  "modified_by": "Administrator",
  "module": "AKF Projects",
  "name": "Project Approval Form",

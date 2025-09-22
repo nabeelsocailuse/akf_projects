@@ -43,7 +43,7 @@ class ProjectApprovalForm(Document):
             if allowed_role:
                 # all users with this role
                 users = frappe.get_all("Has Role", filters={"role": allowed_role}, fields=["parent"])
-                user_ids = [u.parent for u in users]
+                user_ids = [u.parent for u in users if u.parent != "Administrator"]
 
                 if user_ids:
                     # check if any of these users have a User Permission for this service_area
@@ -65,12 +65,6 @@ class ProjectApprovalForm(Document):
                         next_user = user_ids[0]
 
             # update next_approver fields
-            if next_user:
-                self.next_approver_id = next_user
-                self.next_approver_name = get_fullname(next_user)
-
-
-            # update next_approver_id
             if next_user:
                 self.next_approver_id = next_user
                 self.next_approver_name = get_fullname(next_user)

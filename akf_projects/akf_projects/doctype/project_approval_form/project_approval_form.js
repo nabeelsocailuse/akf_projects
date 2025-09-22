@@ -36,7 +36,7 @@ frappe.ui.form.on("Project Approval Form", {
         empty_fields(frm);
         set_filters(frm);
         set_fund_class_permissions(frm);
-        block_fields(frm);
+        // block_fields(frm);
         render_state_table(frm);
     },
     onload: function(frm) {
